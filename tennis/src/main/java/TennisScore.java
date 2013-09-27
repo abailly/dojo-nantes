@@ -6,7 +6,11 @@ public class TennisScore {
     private static String[] marques = new String[]{"0","15","30","40"};
     
     public String score() {
-        return marques[scoreA] + "-" + marques[scoreB];
+        if (scoreA == 4) {
+            return "avantage A";
+        } else {
+            return marques[scoreA] + "-" + marques[scoreB];
+        }
     }
 
     public TennisScore joueurAMarque() {
