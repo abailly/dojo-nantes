@@ -10,4 +10,8 @@ public class TennisScore {
     public void joueurAMarque() {
         scoreA += 15;
     }
+
+    public void joueurBMarque() {
+        scoreB += 15;
+    }
 }

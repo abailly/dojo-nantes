@@ -23,5 +23,13 @@ public class TennisScoreTest {
         score.joueurAMarque();
         assertEquals("30-0", score.score());
     }
+    
+    @Test
+    public void joueurA_marque_2_fois_puis_joueurB_marque_le_score_est_30_15() throws Exception {
+        score.joueurAMarque();
+        score.joueurAMarque();
+        score.joueurBMarque();
+        assertEquals("30-15", score.score());
+    }
 }
 
