@@ -1,12 +1,13 @@
 public class TennisScore {
 
-    private String score = "0-0";
+    private int scoreA = 0;
+    private int scoreB = 0;
 
     public String score() {
-        return score;
+        return scoreA + "-" + scoreB;
     }
 
     public void joueurAMarque() {
-    score = "15-0";
+        scoreA += 15;
     }
 }
