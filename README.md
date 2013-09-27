@@ -2,12 +2,12 @@ Ceci est le repository du *Coding Dojo de Nantes*.
 
 # Comment ça marche?
 
-    « Si je veux apprendre le judo, je vais m’inscrire au dojo le plus proche où après un ou deux ans de pratique hebdomadaire je
-    pourrais choisir d’approfondir mon art. Si tout va bien, après plusieurs années de pratique assidue au sein d’un collectif, je
-    deviendrai ceinture noire ce qui sera simplement le signe d’une nouvelle forme d’apprentissage. Aucun maître n’arrête jamais
-    d’apprendre. Aucune maîtrise ne s’acquiert seul. » 
-
-    – Laurent Bossavit, co-inventeur du Coding Dojo
+> « Si je veux apprendre le judo, je vais m’inscrire au dojo le plus proche où après un ou deux ans de pratique hebdomadaire je
+> pourrais choisir d’approfondir mon art. Si tout va bien, après plusieurs années de pratique assidue au sein d’un collectif, je
+> deviendrai ceinture noire ce qui sera simplement le signe d’une nouvelle forme d’apprentissage. Aucun maître n’arrête jamais
+> d’apprendre. Aucune maîtrise ne s’acquiert seul. » 
+> 
+> – Laurent Bossavit, co-inventeur du Coding Dojo
 
 Un dojo de code – coding dojo – est un lieu où pratiquer et apprendre à coder collectivement, pour tous ceux que le code passionne
 ou a minima intéresse. Un lieu où expérimenter, découvrir, ralentir, respirer, discuter, oser, montrer, argumenter, bref vivre
