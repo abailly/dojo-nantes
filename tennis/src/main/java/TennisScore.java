@@ -3,20 +3,18 @@ public class TennisScore {
     private int scoreA = 0;
     private int scoreB = 0;
 
+    private static String[] marques = new String[]{"0","15","30","40"};
+    
     public String score() {
-        return scoreA + "-" + scoreB;
+        return marques[scoreA] + "-" + marques[scoreB];
     }
 
     public TennisScore joueurAMarque() {
-        if (scoreA < 30) {
-            scoreA += 15;
-        } else {
-            scoreA = 40;
-        }
+        scoreA++; 
         return this;
     }
 
     public void joueurBMarque() {
-        scoreB += 15;
+        scoreB ++;
     }
 }
