@@ -7,8 +7,13 @@ public class TennisScore {
     
     public String score() {
         if (scoreA == 4) {
+            
+            if(scoreA == scoreB) {
+                return "egalite";
+            }
             return "avantage A";
-        } else {
+        }
+        else {
             return marques[scoreA] + "-" + marques[scoreB];
         }
     }

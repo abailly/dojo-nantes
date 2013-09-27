@@ -62,5 +62,18 @@ public class TennisScoreTest {
                 .joueurAMarque();
         assertEquals("avantage A", score.score());
     }
+
+    @Test
+    public void joueurA_avantage_joueurB_marque_donne_egalite() throws Exception {
+        score.joueurAMarque()
+                .joueurAMarque()
+                .joueurAMarque()
+                .joueurBMarque()
+                .joueurBMarque()
+                .joueurBMarque()
+                .joueurAMarque()
+                .joueurBMarque();
+        assertEquals("egalite", score.score());
+    }
 }
 
