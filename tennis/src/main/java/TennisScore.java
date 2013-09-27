@@ -10,11 +10,12 @@ public class TennisScore {
     }
 
     public TennisScore joueurAMarque() {
-        scoreA++; 
+        scoreA++;
         return this;
     }
 
-    public void joueurBMarque() {
+    public TennisScore joueurBMarque() {
         scoreB ++;
+        return this;
     }
 }

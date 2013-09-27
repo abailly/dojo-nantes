@@ -40,6 +40,15 @@ public class TennisScoreTest {
         assertEquals("30-15", score.score());
     }
 
-
+    @Test
+    public void joueurA_marque_3_fois_puis_joueur_B_marque_3_fois_donne_egalite() throws Exception {
+        score.joueurAMarque()
+                .joueurAMarque()
+                .joueurAMarque()
+                .joueurBMarque()
+                .joueurBMarque()
+                .joueurBMarque();
+        assertEquals("40-40", score.score());
+    }
 }
 
