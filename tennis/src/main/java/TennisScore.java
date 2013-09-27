@@ -8,7 +8,11 @@ public class TennisScore {
     }
 
     public TennisScore joueurAMarque() {
-        scoreA += 15;
+        if (scoreA < 30) {
+            scoreA += 15;
+        } else {
+            scoreA = 40;
+        }
         return this;
     }
 

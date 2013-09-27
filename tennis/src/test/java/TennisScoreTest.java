@@ -18,10 +18,18 @@ public class TennisScoreTest {
     }
 
     @Test
-    public void au_debut_quand_a_remarque_un_point_le_score_est_30_0() throws Exception {
+    public void au_debut_quand_a_marque_deux_points_le_score_est_30_0() throws Exception {
         score.joueurAMarque()
                 .joueurAMarque();
         assertEquals("30-0", score.score());
+    }
+
+    @Test
+    public void au_debut_quand_a_marque_trois_points_le_score_est_40_0() throws Exception {
+        score.joueurAMarque()
+                .joueurAMarque()
+                .joueurAMarque();
+        assertEquals("40-0", score.score());
     }
 
     @Test
