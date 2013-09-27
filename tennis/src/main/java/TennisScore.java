@@ -7,8 +7,9 @@ public class TennisScore {
         return scoreA + "-" + scoreB;
     }
 
-    public void joueurAMarque() {
+    public TennisScore joueurAMarque() {
         scoreA += 15;
+        return this;
     }
 
     public void joueurBMarque() {
