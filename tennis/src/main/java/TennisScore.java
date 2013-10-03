@@ -4,10 +4,10 @@ public class TennisScore {
     private int scoreB = 0;
 
     private static String[] marques = new String[]{"0","15","30","40"};
-    
+
     public String score() {
         if (scoreA == 4) {
-            
+
             if(scoreA == scoreB) {
                 return "egalite";
             }
