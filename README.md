@@ -22,7 +22,6 @@ Un dojo de code – coding dojo – est un lieu où pratiquer et apprendre à co
 # Sessions
 
 * [Session du 27 septembre 2013](tennis)
-* [Prochaine session le 10 octobre 2013](http://cantine.atlantic2.org/evenements/coding-dojo-2/)
 
 # Liens
 
