@@ -4,8 +4,8 @@
 
 * Sébastien F.
 * Sébastien P.
-* Antoine 
-* Alvin 
+* Antoine
+* Alvin
 * Marie
 * [Arnaud](http://github.com/abailly)
 
@@ -15,7 +15,7 @@
 
 ## Quoi ?
 
-* Arnaud: [PokerHand](), javascript, randori 
+* Arnaud: [PokerHand](), javascript, randori
 * Antoine: Distribuer les cartes de Poker, javascript, randori
 * Seb. F: Affichage des scores de tennis, java, randori (**sujet retenu**)
 * Alvin: Timer web, javascript, randori
