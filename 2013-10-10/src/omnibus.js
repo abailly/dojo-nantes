@@ -1,7 +1,13 @@
-var Omnibus  = (function() {
-    return {
-        nextCommand : function() { return "OPEN"; }
+var Omnibus = (function () {
+    var commands = ["OPEN", "CLOSE"];
+    var next = 0;
+
+    var nextCommand = function () {
+        return commands[next++];
     }
+    return {
+        nextCommand : nextCommand
+    };
 });
 
 module.exports = Omnibus;
