@@ -66,6 +66,20 @@ vows.describe("controlleur de l'omnibus").addBatch({
         'it goes down': function (topic) {
             assert.equal(topic, "DOWN");
         }
+    },
+    'when omnibus goes from 5th to 4t floor': {
+        topic: function () {
+            var omnibus = new Omnibus();
+            for (var i = 0; i < 20; i++) {
+                omnibus.nextCommand();
+            }
+            return omnibus.nextCommand();
+        },
+
+        'it goes down': function (topic) {
+            assert.equal(topic, "DOWN");
+        }
     }
+
 
 }).run();
