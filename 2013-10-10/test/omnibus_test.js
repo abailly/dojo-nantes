@@ -36,8 +36,22 @@ vows.describe("controlleur de l'omnibus").addBatch({
             return omnibus.nextCommand();
         },
 
-        'it opens then close the door': function(topic) {
+        'it ends up going up': function(topic) {
             assert.equal(topic,"UP");
+        }
+    },
+
+    'when omnibus is asked for nextCommand four times':  {
+        topic: function() {
+            var omnibus = new Omnibus();
+            omnibus.nextCommand();
+            omnibus.nextCommand();
+            omnibus.nextCommand();
+            return omnibus.nextCommand();
+        },
+
+        'it opens the door': function(topic) {
+            assert.equal(topic,"OPEN");
         }
     }
     
