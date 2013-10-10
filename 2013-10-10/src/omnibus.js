@@ -1,5 +1,5 @@
 var Omnibus = (function () {
-    var commands = ["OPEN", "CLOSE"];
+    var commands = ["OPEN", "CLOSE","UP"];
     var next = 0;
 
     var nextCommand = function () {
