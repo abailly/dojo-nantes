@@ -1,10 +1,10 @@
 var Omnibus = (function () {
-    var commands = ["OPEN", "CLOSE","UP", "OPEN"];
+    var commands = ["OPEN", "CLOSE","UP"];
     var next = 0;
     
 
     var nextCommand = function () {
-        return commands[next++];
+        return commands[next++ % 3];
     }
     return {
         nextCommand : nextCommand
