@@ -17,3 +17,8 @@
 * (**sujet retenu**) Ascenseur de [code story](http://www.code-story.net/blog/), Javascript, randori
 
 ## Comment ?
+
+* un peu fastidieux à mettre en place, on a eu une base assez rapidement avec un bootstrap js 
+* un peu galéré pour avoir des tests ok, import de modules foirés... pb techniques d'environnement js mal maîtrisé
+* on a fait l'omnibus assez facilement
+* pas mal de redondance dans les test, difficile à supprimer?
