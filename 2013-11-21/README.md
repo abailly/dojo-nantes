@@ -22,5 +22,7 @@
 
 ## Comment ?
 
-* 
-
+* Pas mal de nouveau
+* C'est loin... je me souviens plus
+* Java c'est verbeux... beaucoup de bruit, de cérémonie pour avoir un truc qui marche.
+* Barrière technique à l'entrée pour les impétrants
