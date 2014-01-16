@@ -8,7 +8,7 @@
 
 ## Next ?
 
-* Jeudi 16 janvier 2013, à [La Cantine](http://cantine.atlantic2.org/evenements/coding-dojo-6/)
+* Jeudi 16 janvier 2013, à [La Cantine](http://cantine.atlantic2.org/evenements/coding-dojo-6-2/)
 
 ## Quoi ?
 
@@ -18,4 +18,5 @@
 
 ## Comment ?
 
-*
+* On pourrait faire la rétro à la fin de la session, vu qu'on ne se souvient pas de ce qu'on a fait quinze jours après
+* La motion est adoptée à l'unanimité!
