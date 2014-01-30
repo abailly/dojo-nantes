@@ -6,7 +6,7 @@
 * Sébastien F.
 * Alvin
 * Benoît
-* Timothée
+* [Timothée](http://github.com/hettomei)
 * [Arnaud](http://github.com/abailly)
 * Gautier
 
