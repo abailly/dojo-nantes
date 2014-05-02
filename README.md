@@ -4,7 +4,7 @@ Ceci est le repository du *Coding Dojo de Nantes*.
 
 * Quand?
   * In vivo: [jeudi 15 mai 2014](http://cantine.atlantic2.org/evenements/coding-dojo-11/)
-  * In numero: [vendredi 16 mai 2014](dojo-virtuel)
+  * [In numero](dojo-virtuel): Tous les vendredi de 12h à 14h (heure de Nantes) à partir du 16 mai
 * Où? [La Cantine numérique](https://maps.google.com/maps?q=11+Impasse+Juton+%C3%A0+Nantes&hl=en&ie=UTF8&ll=47.212922,-1.552613&spn=0.008979,0.021136&sll=37.0625,-95.677068&sspn=42.716829,86.572266&t=h&hq=11+Impasse+Juton&hnear=Nantes,+Loire-Atlantique,+Pays+de+la+Loire,+France&z=16)
 
 # Comment ça marche?
