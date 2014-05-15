@@ -24,6 +24,7 @@ Un dojo de code – coding dojo – est un lieu où pratiquer et apprendre à co
 
 ## 2014
 
+* [Session du 15 mai 2014](2014-05-15)
 * [Session du 20 mars 2014](2014-03-20)
 * [Session du 30 janvier 2014](2014-01-30)
 * [Session du 16 janvier 2014](2014-01-16)
