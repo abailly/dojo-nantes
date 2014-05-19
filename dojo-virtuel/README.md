@@ -38,12 +38,15 @@ Toutes les commandes à l'intérieur de tmux commencent par un `Ctrl+b`:
 
 ### Vim crash course
 
+Voir [vim](http://www.vim.org) pour plus de documentation.
+
 Deux modes : édition et commande
 On passe en mode édition avec `i` (insert), `a` (append), on en sort avec `Echap`
 En mode commande :
 * `:q` pour quitter vi
 * `:e` nom pour éditer un fichier (existant ou pas encore)
 * `:w [nom]` : Enregistrement [sous le nom donné]
+* `x` : Supprimer le caractère suivant
 * `dd` : Suppression de la ligne courante
-
+* `yy` : Copie de la dernière ligne supprimée
 
