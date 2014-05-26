@@ -8,7 +8,7 @@
 * Benoît
 * [Timothée](http://github.com/hettomei)
 * [Arnaud](http://github.com/abailly)
-* Gautier
+* [Gautier](http://github.com/jabby)
 
 ## Next ?
 
