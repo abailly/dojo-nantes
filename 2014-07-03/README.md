@@ -7,7 +7,7 @@
 
 ## Quoi ?
 
-* python, number names, randori sur [cyber-dojo](http://cyber-dojo.org/kata/edit/4859A7)
+* python, number names, randori sur [cyber-dojo](http://cyber-dojo.org/kata/edit/4859A7?avatar=koala)
 
 ## Tests
 
