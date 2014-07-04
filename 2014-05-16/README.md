@@ -4,7 +4,7 @@
 
 * [Etienne](http://www.patasel.com/)
 * [Arnaud](http://github.com/abailly)
-* [Cedric]()
+* [Cedric](https://twitter.com/CedricPineau)
 
 ## Quoi ?
 

@@ -5,12 +5,12 @@ import  M
 
 --recette = "La meilleure main est " ~: TestList [
 --    bestHand [H2,D3,S5,C9,DK] [C2,H3,S4,C8,HA] ~?= (White,[HA]) 
---    ]
+-- ]
 
 can_detect_pair = TestList [
   combination [ d2 ]     ~?= HighCard 2,   
   combination [ h3 ]     ~?= HighCard 3,   
-  combination [ d3 ]      ~?= HighCard 3,   
+  combination [ d4 ]      ~?= HighCard 3,   
   combination [ h2, d3 ] ~?= HighCard 3,    
   combination [ h2, d2 ] ~?= Pair 2,
   combination [ h3, d3 ] ~?= Pair 3,
