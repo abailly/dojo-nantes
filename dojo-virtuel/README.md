@@ -50,3 +50,6 @@ En mode commande :
 * `dd` : Suppression de la ligne courante
 * `yy` : Copie de la dernière ligne supprimée
 
+# Links
+
+* Une explication détaillée du binômage à distance: https://github.com/livingsocial/ls-pair
