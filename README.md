@@ -3,7 +3,7 @@ Ceci est le repository du *Coding Dojo de Nantes*.
 # Prochaine session
 
 * Quand?
-* In vivo: [jeudi 3 juillet 2014](http://cantine.atlantic2.org/evenements/coding-dojo-13/)
+* In vivo: [vendredi 17 octobre 2014](http://cantine.atlantic2.org/evenements/coding-dojo-15/)
   * [In numero](dojo-virtuel): Tous les vendredi de 12h à 14h (heure de Nantes) à partir du 16 mai
 * Où? [La Cantine numérique](https://maps.google.com/maps?q=11+Impasse+Juton+%C3%A0+Nantes&hl=en&ie=UTF8&ll=47.212922,-1.552613&spn=0.008979,0.021136&sll=37.0625,-95.677068&sspn=42.716829,86.572266&t=h&hq=11+Impasse+Juton&hnear=Nantes,+Loire-Atlantique,+Pays+de+la+Loire,+France&z=16)
 
@@ -24,8 +24,9 @@ Un dojo de code – coding dojo – est un lieu où pratiquer et apprendre à co
 
 ## 2014
 
-* [Session du 27 juin 2014](2014-05-27)
-* [Session du 20 juin 2014](2014-05-20)
+* [Session du 2 octobre 2014](2014-10-02)
+* [Session du 27 juin 2014](2014-06-27)
+* [Session du 20 juin 2014](2014-06-20)
 * [Session du 16 mai 2014](2014-05-16)
 * [Session du 15 mai 2014](2014-05-15)
 * [Session du 20 mars 2014](2014-03-20)
