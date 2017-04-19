@@ -1,0 +1,41 @@
+
+./app/Main.hs,52
+module Main Main0,1
+main main4,5
+main main5,6
+
+./Setup.hs,15
+main main1,2
+
+./src/Lib.hs,65
+module LibLib0,1
+someFunc someFunc4,5
+someFunc someFunc5,6
+
+./test/DojoSpec.hs,645
+module DojoSpec DojoSpec0,1
+data Marque Marque4,5
+data Marque = ZeroZero4,5
+            | QuinzeQuinze5,6
+            | TrenteTrente6,7
+incremente incremente9,10
+incremente incremente10,11
+data Score Score13,14
+data Score = Score Score13,14
+data Score = Score { scoreA scoreA13,14
+                   , scoreB scoreB14,15
+data Coup Coup18,19
+data Coup = A A18,19
+data Coup = A | BB18,19
+type Partie Partie20,21
+partieVide partieVide22,23
+gagne gagne24,25
+gagne gagne25,26
+score score28,29
+score score29,30
+scoreInitial scoreInitial33,34
+scoreInitial scoreInitial34,35
+spec spec36,37
+spec spec37,38
+
+./test/Spec.hs,0
