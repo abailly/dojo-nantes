@@ -1,0 +1,65 @@
+resource "google_compute_disk" "dojo-vm-image" {
+  name  = "dojo-vm-disk-image"
+  type  = "pd-ssd"
+  zone  = "europe-west1-b"
+  size  = 200
+  image = "iog-hydra-1637229888"
+  labels = {
+    environment = "dev"
+  }
+}
+
+resource "google_compute_instance" "dojo-vm" {
+  name         = "dojo-vm-1"
+
+  # For faster CPUs
+  # see https://cloud.google.com/compute/docs/compute-optimized-machines
+  machine_type = "c2-standard-4"
+  allow_stopping_for_update = true
+
+  tags = [ "dev-machine" ]
+
+  metadata = {
+    sshKeys = file("ssh_keys")
+  }
+
+  boot_disk {
+    source = google_compute_disk.dojo-vm-image.self_link
+  }
+
+  network_interface {
+    network = "default"
+
+    access_config {
+      // Ephemeral IP
+    }
+  }
+
+  connection {
+    type        = "ssh"
+    user        = "curry"
+    private_key = file(var.private_key_file)
+    host        = google_compute_instance.dojo-vm.network_interface.0.access_config.0.nat_ip
+  }
+
+  provisioner "file" {
+    source      = "scripts/configure.sh"
+    destination = "/home/curry/configure.sh"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "chmod +x /home/curry/configure.sh",
+      "/home/curry/configure.sh"
+    ]
+  }
+
+}
+
+output "dojo_id" {
+  value = google_compute_instance.dojo-vm.self_link
+}
+
+output "dojo_ip" {
+  value = google_compute_instance.dojo-vm.network_interface.0.access_config.0.nat_ip
+}
