@@ -49,6 +49,12 @@ En mode commande :
 * `x` : Supprimer le caractère courant (sous le curseur)
 * `dd` : Suppression de la ligne courante (sous le curseur)
 * `yy` : Copie de la ligne courante (sous le curseur)
+* `p` : Collage de la dernière valeur supprimée ou copiée
+* déplacements :
+  * `h`, `j`, `k`, `l` (ou les flèches directionnelles) : pour gauche, bas, haut, et droite respectivement
+  * `^` : aller au premier caractère non blanc de la ligne
+  * `0` : aller au premier caractère de la ligne
+  * `$` : aller au dernier caractère de la ligne
 
 # Links
 
