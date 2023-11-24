@@ -40,15 +40,21 @@ Toutes les commandes à l'intérieur de tmux commencent par un `Ctrl+b`:
 
 Voir [vim](http://www.vim.org) pour plus de documentation.
 
-Deux modes : édition et commande
-On passe en mode édition avec `i` (insert), `a` (append), on en sort avec `Echap`
-En mode commande :
+Deux modes : normal, et édition.
+Par défaut, on est dans le mode normal. On passe en mode édition avec `i` (insert), `a` (append), on en sort avec `Echap`.
+En mode normal :
 * `:q` pour quitter vi
 * `:e` nom pour éditer un fichier (existant ou pas encore)
 * `:w [nom]` : Enregistrement [sous le nom donné]
-* `x` : Supprimer le caractère suivant
-* `dd` : Suppression de la ligne courante
-* `yy` : Copie de la dernière ligne supprimée
+* `x` : Supprimer le caractère courant (sous le curseur)
+* `dd` : Suppression de la ligne courante (sous le curseur)
+* `yy` : Copie de la ligne courante (sous le curseur)
+* `p` : Collage de la dernière valeur supprimée ou copiée
+* déplacements :
+  * `h`, `j`, `k`, `l` (ou les flèches directionnelles) : pour gauche, bas, haut, et droite respectivement
+  * `^` : aller au premier caractère non blanc de la ligne
+  * `0` : aller au premier caractère de la ligne
+  * `$` : aller au dernier caractère de la ligne
 
 # Links
 
