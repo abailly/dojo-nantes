@@ -46,9 +46,9 @@ En mode commande :
 * `:q` pour quitter vi
 * `:e` nom pour éditer un fichier (existant ou pas encore)
 * `:w [nom]` : Enregistrement [sous le nom donné]
-* `x` : Supprimer le caractère suivant
-* `dd` : Suppression de la ligne courante
-* `yy` : Copie de la dernière ligne supprimée
+* `x` : Supprimer le caractère courant (sous le curseur)
+* `dd` : Suppression de la ligne courante (sous le curseur)
+* `yy` : Copie de la ligne courante (sous le curseur)
 
 # Links
 
