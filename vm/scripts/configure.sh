@@ -37,6 +37,15 @@ if [[ -f ~/.bash_aliases ]]; then
 fi
 ln -s ~/dotfiles/.bash_aliases ~/.bash_aliases
 
+# install SBCL
+# needs to happen before configuring emacs
+sudo apt install sbcl
+curl -o /tmp/ql.lisp http://beta.quicklisp.org/quicklisp.lisp
+sbcl --no-sysinit --no-userinit --load /tmp/ql.lisp \
+       --eval '(quicklisp-quickstart:install :path "~/.quicklisp")' \
+       --eval '(ql:add-to-init-file)' \
+       --quit
+
 # run Emacs installation script, mostly for preinstalling a bunch of
 # packages
 emacs --batch -q -l dotfiles/install.el
@@ -66,11 +75,3 @@ env NIX_PATH="REPEAT=/dev/null" nix-env --upgrade
 
 # install latest GHCup
 curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | BOOTSTRAP_HASKELL_NONINTERACTIVE=1 BOOTSTRAP_HASKELL_GHC_VERSION=latest BOOTSTRAP_HASKELL_CABAL_VERSION=latest BOOTSTRAP_HASKELL_INSTALL_STACK=1 BOOTSTRAP_HASKELL_INSTALL_HLS=1 BOOTSTRAP_HASKELL_ADJUST_BASHRC=P sh
-
-# install SBCL
-sudo apt install sbcl
-curl -o /tmp/ql.lisp http://beta.quicklisp.org/quicklisp.lisp
-sbcl --no-sysinit --no-userinit --load /tmp/ql.lisp \
-       --eval '(quicklisp-quickstart:install :path "~/.quicklisp")' \
-       --eval '(ql:add-to-init-file)' \
-       --quit
