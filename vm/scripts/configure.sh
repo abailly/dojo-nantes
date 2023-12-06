@@ -39,7 +39,8 @@ ln -s ~/dotfiles/.bash_aliases ~/.bash_aliases
 
 # install SBCL
 # needs to happen before configuring emacs
-sudo apt install sbcl
+sudo apt update
+sudo apt install -y sbcl
 curl -o /tmp/ql.lisp http://beta.quicklisp.org/quicklisp.lisp
 sbcl --no-sysinit --no-userinit --load /tmp/ql.lisp \
        --eval '(quicklisp-quickstart:install :path "~/.quicklisp")' \
