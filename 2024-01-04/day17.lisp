@@ -91,8 +91,9 @@
 ;; la forme de fonctions
 
 (defun out-of-bounds (graph node)
-  (> (node-col node)
-     (1- (length (car graph)))))
+  (or (< (node-col node) 0)
+      (> (node-col node)
+         (1- (length (car graph))))))
 
 (defstruct node
   row
@@ -101,35 +102,46 @@
 (defmacro node! (x y)
   `(make-node :row ,x :col ,y))
 
-(defun neighbours (graph node)
-  (let* ((row (node-row node))
-         (col (node-col node))
-         (neighbour (node! row (+ 1 col)))
-         (is-out-of-bound (lambda (node)
-                            (out-of-bounds graph node))))
-    (remove-if is-out-of-bound
-               (list neighbour))))
+(defun eq-node (n1 n2)
+  (and (= (node-row n1) (node-row n2))
+       (= (node-col n1) (node-col n2))))
+
+(defun east-neighbour (node)
+  (make-node :row (node-row node)
+             :col (1+ (node-col node))))
+
+(defun west-neighbour (node)
+  (make-node :row (node-row node)
+             :col (1- (node-col node))))
+
+(defun neighbours (graph path node)
+  (let* ((is-invalid-neighbour
+           (lambda (node)
+             (or
+              (out-of-bounds graph node)
+              (and (not (null path))
+                   (eq-node (car path) node))))))
+
+    (remove-if is-invalid-neighbour
+               (list
+                (west-neighbour node)
+                (east-neighbour node)))))
 
 (defun weight (graph node)
   (let ((row (nth (node-row node) graph)))
     (nth (node-col node) row)))
-
-;; on a besoin de savoir par où on est déjà passé -> cache ?
-;; le cache doit tenir compte des déplacements
-(defun cache (node)
-  nil)
 
 (defun minimum (list)
   (if (null list)
       0
       (apply #'min list)))
 
-(defun lightest-path (graph src dest)
+(defun lightest-path (graph path src dest)
   (let* ((lightest-path-from
            (lambda (node)
-             (lightest-path graph node dest)))
+             (lightest-path graph (cons src path) node dest)))
          (lightest-subpaths
-           (mapcar lightest-path-from (neighbours graph src))))
+           (mapcar lightest-path-from (neighbours graph path src))))
     (+ (minimum lightest-subpaths)
        (weight graph src))))
 
@@ -141,12 +153,13 @@
 
 (let ((expected 7)
       (actual (lightest-path '((2 5))
+                             ()
                              (node! 0 0)
                              (node! 0 1))))
   (assert-equal! actual expected))
 
 (let ((expected 8)
-      (actual (lightest-path '((2 1 5))
+      (actual (lightest-path '((2 1 5)) ()
                              (node! 0 0)
                              (node! 0 2))))
   (assert-equal! expected actual))
