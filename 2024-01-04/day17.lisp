@@ -98,10 +98,13 @@
   row
   col)
 
+(defmacro node! (x y)
+  `(make-node :row ,x :col ,y))
+
 (defun neighbours (graph node)
   (let* ((row (node-row node))
          (col (node-col node))
-         (neighbour (make-node :row row :col (+ 1 col)))
+         (neighbour (node! row (+ 1 col)))
          (is-out-of-bound (lambda (node)
                             (out-of-bounds graph node))))
     (remove-if is-out-of-bound
@@ -122,14 +125,13 @@
       (apply #'min list)))
 
 (defun lightest-path (graph src dest)
-  (let* ((node-src (make-node :row (car src) :col (cadr src)))
-         (lightest-path-from
+  (let* ((lightest-path-from
            (lambda (node)
-             (lightest-path graph (list (node-row node) (node-col node)) dest)))
+             (lightest-path graph node dest)))
          (lightest-subpaths
-           (mapcar lightest-path-from (neighbours graph node-src))))
+           (mapcar lightest-path-from (neighbours graph src))))
     (+ (minimum lightest-subpaths)
-       (weight graph node-src))))
+       (weight graph src))))
 
 ;; high-level tests
 (defmacro assert-equal! (actual expected)
@@ -139,11 +141,12 @@
 
 (let ((expected 7)
       (actual (lightest-path '((2 5))
-                             '(0 0)
-                             '(0 1))))
+                             (node! 0 0)
+                             (node! 0 1))))
   (assert-equal! actual expected))
 
 (let ((expected 8)
       (actual (lightest-path '((2 1 5))
-                             '(0 0) '(0 2))))
+                             (node! 0 0)
+                             (node! 0 2))))
   (assert-equal! expected actual))
