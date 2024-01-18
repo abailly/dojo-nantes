@@ -91,18 +91,25 @@
 ;; la forme de fonctions
 
 (defun out-of-bounds (graph node)
-  (> (cadr node)
+  (> (node-col node)
      (1- (length (car graph)))))
 
+(defstruct node
+  row
+  col)
+
 (defun neighbours (graph node)
-  (destructuring-bind (row col) node
-    (let ((neighbour (list row (+ 1 col))))
-      (remove-if (lambda (node) (out-of-bounds graph node))
-                 (list neighbour)))))
+  (let* ((row (node-row node))
+         (col (node-col node))
+         (neighbour (make-node :row row :col (+ 1 col)))
+         (is-out-of-bound (lambda (node)
+                            (out-of-bounds graph node))))
+    (remove-if is-out-of-bound
+               (list neighbour))))
 
 (defun weight (graph node)
-  (let ((row (nth (car node) graph)))
-    (nth (cadr node) row)))
+  (let ((row (nth (node-row node) graph)))
+    (nth (node-col node) row)))
 
 ;; on a besoin de savoir par où on est déjà passé -> cache ?
 ;; le cache doit tenir compte des déplacements
@@ -115,13 +122,14 @@
       (apply #'min list)))
 
 (defun lightest-path (graph src dest)
-  (let* ((lightest-path-from
+  (let* ((node-src (make-node :row (car src) :col (cadr src)))
+         (lightest-path-from
            (lambda (node)
-             (lightest-path graph node dest)))
+             (lightest-path graph (list (node-row node) (node-col node)) dest)))
          (lightest-subpaths
-           (mapcar lightest-path-from (neighbours graph src))))
+           (mapcar lightest-path-from (neighbours graph node-src))))
     (+ (minimum lightest-subpaths)
-       (weight graph src))))
+       (weight graph node-src))))
 
 ;; high-level tests
 (defmacro assert-equal! (actual expected)
