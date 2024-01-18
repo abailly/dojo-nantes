@@ -115,12 +115,13 @@
       (apply #'min list)))
 
 (defun lightest-path (graph src dest)
-  (let ((subweight (minimum
-                    (mapcar (lambda (node)
-                              (lightest-path graph node dest))
-                            (neighbours graph src)))))
-    (+ (weight graph src)
-       subweight)))
+  (let* ((lightest-path-from
+           (lambda (node)
+             (lightest-path graph node dest)))
+         (lightest-subpaths
+           (mapcar lightest-path-from (neighbours graph src))))
+    (+ (minimum lightest-subpaths)
+       (weight graph src))))
 
 ;; high-level tests
 (defmacro assert-equal! (actual expected)
