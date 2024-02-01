@@ -125,13 +125,16 @@
   (make-node :row (1- (node-row node))
              :col (node-col node)))
 
+(defun in-path (path node)
+  (find-if (lambda (n) (eq-node n node)) path))
+
 (defun neighbours (graph path node)
   (let* ((is-invalid-neighbour
            (lambda (node)
              (or
               (out-of-bounds graph node)
               (and (not (null path))
-                   (eq-node (car path) node))))))
+                   (in-path path node))))))
 
     (remove-if is-invalid-neighbour
                (list
@@ -152,15 +155,20 @@
 (defun lightest-path (graph path src dest)
   (cond
     ((eq-node src dest)
-     (weight graph src))
+     (progn
+       (weight graph dest)))
     (t
      (let* ((lightest-path-from
               (lambda (node)
                 (lightest-path graph (cons src path) node dest)))
             (lightest-subpaths
-              (mapcar lightest-path-from (neighbours graph path src))))
-       (+ (minimum lightest-subpaths)
-          (weight graph src))))))
+              (mapcar lightest-path-from (neighbours graph path src)))
+            (res
+              (+ (weight graph src)
+                 (minimum lightest-subpaths))
+              ))
+       (progn
+         res)))))
 
 ;; high-level tests
 (defmacro assert-equal! (actual expected)
@@ -186,4 +194,12 @@
                                (1 3)) ()
                                (node! 0 0)
                                (node! 1 1))))
+  (assert-equal! actual expected))
+
+(let ((expected 9)
+      (actual (lightest-path '((3 1)
+                               (1 3)
+                               (5 2)) ()
+                               (node! 0 0)
+                               (node! 2 1))))
   (assert-equal! actual expected))
