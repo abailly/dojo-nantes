@@ -93,7 +93,10 @@
 (defun out-of-bounds (graph node)
   (or (< (node-col node) 0)
       (> (node-col node)
-         (1- (length (car graph))))))
+         (1- (length (car graph))))
+      (< (node-row node) 0)
+      (> (node-row node)
+         (1- (length graph)))))
 
 (defstruct node
   row
@@ -114,6 +117,14 @@
   (make-node :row (node-row node)
              :col (1- (node-col node))))
 
+(defun south-neighbour (node)
+  (make-node :row (1+ (node-row node))
+             :col (node-col node)))
+
+(defun north-neighbour (node)
+  (make-node :row (1- (node-row node))
+             :col (node-col node)))
+
 (defun neighbours (graph path node)
   (let* ((is-invalid-neighbour
            (lambda (node)
@@ -125,7 +136,9 @@
     (remove-if is-invalid-neighbour
                (list
                 (west-neighbour node)
-                (east-neighbour node)))))
+                (east-neighbour node)
+                (south-neighbour node)
+                (north-neighbour node)))))
 
 (defun weight (graph node)
   (let ((row (nth (node-row node) graph)))
@@ -137,13 +150,17 @@
       (apply #'min list)))
 
 (defun lightest-path (graph path src dest)
-  (let* ((lightest-path-from
-           (lambda (node)
-             (lightest-path graph (cons src path) node dest)))
-         (lightest-subpaths
-           (mapcar lightest-path-from (neighbours graph path src))))
-    (+ (minimum lightest-subpaths)
-       (weight graph src))))
+  (cond
+    ((eq-node src dest)
+     (weight graph src))
+    (t
+     (let* ((lightest-path-from
+              (lambda (node)
+                (lightest-path graph (cons src path) node dest)))
+            (lightest-subpaths
+              (mapcar lightest-path-from (neighbours graph path src))))
+       (+ (minimum lightest-subpaths)
+          (weight graph src))))))
 
 ;; high-level tests
 (defmacro assert-equal! (actual expected)
@@ -162,4 +179,11 @@
       (actual (lightest-path '((2 1 5)) ()
                              (node! 0 0)
                              (node! 0 2))))
-  (assert-equal! expected actual))
+  (assert-equal! actual expected))
+
+(let ((expected 6)
+      (actual (lightest-path '((2 1)
+                               (1 3)) ()
+                               (node! 0 0)
+                               (node! 1 1))))
+  (assert-equal! actual expected))
