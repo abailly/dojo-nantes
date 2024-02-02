@@ -2,7 +2,7 @@ Ceci est le repository du *Coding Dojo de Nantes*.
 
 # Prochaine session
 
-* Quand? [2024-02-01](2023-02-01)
+* Quand? [2024-02-15](2024-02-15)
 
 # Comment ça marche?
 
@@ -21,6 +21,7 @@ Un dojo de code – coding dojo – est un lieu où pratiquer et apprendre à co
 
 ## 2024
 
+* [Session du 1 février 2024](2024-02-01)
 * [Session du 18 janvier 2024](2024-01-18)
 * [Session du 4 janvier 2024](2023-01-04)
 
