@@ -197,9 +197,9 @@
   (assert-equal! actual expected))
 
 (let ((expected 9)
-      (actual (lightest-path '((3 1)
-                               (1 3)
-                               (5 2)) ()
+      (actual (lightest-path '((1 1)
+                               (1 1)
+                               (1 3)) ()
                                (node! 0 0)
                                (node! 2 1))))
   (assert-equal! actual expected))

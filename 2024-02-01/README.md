@@ -16,3 +16,5 @@
 ## Quoi ?
 
 * On continue le jour 17 d'AoC 2023
+* On a réussi à avancer mais on est arrivé à un point où on galère avec une off-by-one error !
+* On laisse le test rouge pour la prochaine fois...
