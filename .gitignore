@@ -4,3 +4,4 @@
 *.hi
 *.swp
 .stack-work
+dist-newstyle
