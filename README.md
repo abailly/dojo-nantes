@@ -2,7 +2,15 @@ Ceci est le repository du *Coding Dojo de Nantes*.
 
 # Prochaine session
 
-* Quand? [2024-02-15](2024-02-15)
+## Distanciel
+
+* Quand? [2024-05-23](2024-05-23)
+* Où? Sur le [discord Okiwi](https://discord.gg/Hhrm4Avu)
+
+## Présentiel
+
+* Quand [2024-06-06](2024-06-06)
+* Où Dans les locaux de [Palo-IT Nantes](https://maps.app.goo.gl/e5bhRA3fTNcGzdsa8), 1, rue Saint-Julien, Nantes.
 
 # Comment ça marche?
 
