@@ -1,4 +1,5 @@
 import { describe, expect, test } from '@jest/globals';
+
 class Uxn {
     stack: any[]
 
@@ -10,7 +11,10 @@ class Uxn {
         this.stack.push(param)
     }
 
+    emulate (program : string) {
+    }
 }
+
 describe('Uxn VM', () => {
     [42, 43].forEach((v) => {
         test(`LITeral ${v}`, () => {
@@ -19,4 +23,11 @@ describe('Uxn VM', () => {
             expect(uxn.stack).toStrictEqual([v]);
         });
     });
+
+    test ('bytecode', () => {
+        const uxn = new Uxn();
+        uxn.emulate('\x80\x42');
+        expect(uxn.stack).toStrictEqual([0x42]);
+    });
+
 });
