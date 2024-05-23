@@ -3,22 +3,20 @@ class Uxn {
     stack: any[]
 
     constructor () {
-        this.stack = [42]
+        this.stack = []
     }
 
-    lit(param: any) {
+    lit(param: number) {
+        this.stack.push(param)
     }
 
 }
 describe('Uxn VM', () => {
-    test('LITeral', () => {
-        // arrange
-        const uxn = new Uxn();
-
-        //act
-        uxn.lit(42)
-
-        //assert
-        expect(uxn.stack).toStrictEqual([42]);
+    [42, 43].forEach((v) => {
+        test(`LITeral ${v}`, () => {
+            const uxn = new Uxn();
+            uxn.lit(v)
+            expect(uxn.stack).toStrictEqual([v]);
+        });
     });
 });
