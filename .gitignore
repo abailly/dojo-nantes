@@ -6,3 +6,4 @@
 .stack-work
 dist-newstyle
 target/
+node_modules

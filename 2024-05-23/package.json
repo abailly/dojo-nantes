@@ -1,0 +1,17 @@
+{
+  "name": "2024-05-23",
+  "version": "1.0.0",
+  "description": "An experiment in Uxntal VM",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@jest/globals": "^29.7.0",
+    "@types/jest": "^29.5.12",
+    "ts-jest": "^29.1.3",
+    "typescript": "^5.4.5"
+  }
+}
