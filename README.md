@@ -4,7 +4,7 @@ Ceci est le repository du *Coding Dojo de Nantes*.
 
 ## Distanciel
 
-* Quand? [2024-05-23](2024-05-23)
+* Quand? [2024-06-06](2024-06-06)
 * Où? Sur le [discord Okiwi](https://discord.gg/Hhrm4Avu)
 
 ## Présentiel
@@ -29,7 +29,8 @@ Un dojo de code – coding dojo – est un lieu où pratiquer et apprendre à co
 
 ## 2024
 
-* [Seesion du 11 avril 2024](2024-04-11)
+* [Session du 23 mai 2024](2024-05-23)
+* [Session du 11 avril 2024](2024-04-11)
 * [Session du 1 février 2024](2024-02-01)
 * [Session du 18 janvier 2024](2024-01-18)
 * [Session du 4 janvier 2024](2023-01-04)
