@@ -5,3 +5,4 @@
 *.swp
 .stack-work
 dist-newstyle
+target/
