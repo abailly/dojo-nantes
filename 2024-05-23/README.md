@@ -1,3 +1,14 @@
+# Session du 6 juin 2024
+
+## Qui ?
+
+* [Arnaud](http://github.com/abailly)
+* Xavier
+
+## Quoi ?
+
+On continue la VM Uxn en Typescript
+
 # Session du 23 mai 2024
 
 ## Qui ?

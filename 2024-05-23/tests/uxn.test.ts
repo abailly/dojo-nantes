@@ -12,6 +12,7 @@ class Uxn {
     }
 
     emulate (program : string) {
+	this.lit(program.charCodeAt(1));
     }
 }
 
