@@ -4,6 +4,7 @@
 
 * [Arnaud](http://github.com/abailly)
 * Xavier
+* Fabinout
 
 ## Quoi ?
 
