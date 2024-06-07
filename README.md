@@ -40,31 +40,31 @@ Un dojo de code – coding dojo – est un lieu où pratiquer et apprendre à co
 
 ## 2023
 
-* [Session du 7 décembre 2023](2023-12-07)
-* [Session du 23 novembre 2023](2023-11-23)
+* [Session du 7 décembre 2023](2023/2023-12-07)
+* [Session du 23 novembre 2023](2023/2023-11-23)
 
 ## 2017
 
-* [Session du 18 avril 2017](2017-04-18)
+* [Session du 18 avril 2017](2017/2017-04-18)
 
 ## 2014
 
-* [Session du 2 octobre 2014](2014-10-02)
-* [Session du 27 juin 2014](2014-06-27)
-* [Session du 20 juin 2014](2014-06-20)
-* [Session du 16 mai 2014](2014-05-16)
-* [Session du 15 mai 2014](2014-05-15)
-* [Session du 20 mars 2014](2014-03-20)
-* [Session du 30 janvier 2014](2014-01-30)
-* [Session du 16 janvier 2014](2014-01-16)
+* [Session du 2 octobre 2014](2014/2014-10-02)
+* [Session du 27 juin 2014](2014/2014-06-27)
+* [Session du 20 juin 2014](2014/2014-06-20)
+* [Session du 16 mai 2014](2014/2014-05-16)
+* [Session du 15 mai 2014](2014/2014-05-15)
+* [Session du 20 mars 2014](2014/2014-03-20)
+* [Session du 30 janvier 2014](2014/2014-01-30)
+* [Session du 16 janvier 2014](2014/2014-01-16)
 
 ## 2013
 
-* [Session du 12 décembre 2013](2013-12-12)
-* [Session du 21 novembre 2013](2013-11-21)
-* [Session du 7 novembre 2013](2013-11-07)
-* [Session du 10 octobre 2013](2013-10-10)
-* [Session du 27 septembre 2013](2013-09-27-tennis)
+* [Session du 12 décembre 2013](2013/2013-12-12)
+* [Session du 21 novembre 2013](2013/2013-11-21)
+* [Session du 7 novembre 2013](2013/2013-11-07)
+* [Session du 10 octobre 2013](2013/2013-10-10)
+* [Session du 27 septembre 2013](2013/2013-09-27-tennis)
 
 # Liens
 
