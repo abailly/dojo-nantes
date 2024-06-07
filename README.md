@@ -9,7 +9,7 @@ Ceci est le repository du *Coding Dojo de Nantes*.
 
 ## Présentiel
 
-* Quand [2024-06-06](2024-06-06)
+* Quand [2024-07-04](2024-07-04)
 * Où Dans les locaux de [Palo-IT Nantes](https://maps.app.goo.gl/e5bhRA3fTNcGzdsa8), 1, rue Saint-Julien, Nantes.
 
 # Comment ça marche?
@@ -29,7 +29,9 @@ Un dojo de code – coding dojo – est un lieu où pratiquer et apprendre à co
 
 ## 2024
 
-* [Session du 6 juin 2024](2024-05-23)
+* Sessions du 6 juin 2024
+  * [Distanciel](2024-05-23)
+  * [Nantes](2024-06-06-Nantes)
 * [Session du 23 mai 2024](2024-05-23)
 * [Session du 11 avril 2024](2024-04-11)
 * [Session du 1 février 2024](2024-02-01)

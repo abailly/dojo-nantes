@@ -13,8 +13,8 @@ set -e
 
 cat > ~/.gitconfig <<EOF
 [user]
-	name = IOG Engineering
-	email = engineering@iohk.io
+	name = Arnaud Bailly
+	email = arnaud@pankzsoft.com
 [alias]
 	s = status
 	l = log --oneline --graph --decorate
@@ -48,7 +48,7 @@ sbcl --no-sysinit --no-userinit --load /tmp/ql.lisp \
 
 # run Emacs installation script, mostly for preinstalling a bunch of
 # packages
-emacs --batch -q -l dotfiles/install.el
+# emacs --batch -q -l dotfiles/install.el
 
 # accept github.com key
 ssh-keyscan github.com >> ~/.ssh/known_hosts
