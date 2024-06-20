@@ -4,9 +4,11 @@ type Program = string
 
 class Uxn {
     stack: any[]
+    devices: (Device | null)[]
 
     constructor (devices: (Device | null)[] = []) {
         this.stack = []
+	this.devices = devices;
     }
 
     lit(param: number) {
@@ -33,6 +35,16 @@ class Uxn {
                 case 0x02:
                     this.pop();
                     break;
+                case 0x17:
+                    const device = this.stack.pop();
+		    const val = this.stack.pop();
+		    const deviceIndex = (0xf0 & device) >> 4;
+		    const port = 0x0f & device;
+		    const selectedDevice  = this.devices[deviceIndex];
+		    if (selectedDevice) {
+		    	selectedDevice.output(port, val);
+		    }	
+                    break;
             }
         }
     }
@@ -40,9 +52,16 @@ class Uxn {
 
 class Device {
 
+	out : number[][] = [[], [], [], [], [], [], [], [], [], [], [], [], [], [], [], []] 
+
         get (port : number) : number[] {
-                return [];
+                return this.out[port];
         }
+
+	output (port : number, value : number) {
+		this.out[port].unshift(value);
+	}
+
 }
 
 describe('Uxn VM', () => {
@@ -84,12 +103,26 @@ describe('Uxn VM', () => {
             const devices = [null, consoleAdapter, null, null, null, null, null, null, null, null, null, null, null, null, null, null];
             const uxn = new Uxn(devices);
 
-            const device = 128;
+            const device = 16;
             const port = 8;
 
             // write the byte 0x43 to port 0x08 of device 0x10
             uxn.emulate(`\x80\x43\x80${String.fromCharCode(device + port)}\x17`);
             expect(consoleAdapter.get(0x08)).toStrictEqual([0x43]);
+            expect(uxn.stack).toStrictEqual([]);
+        });
+
+        test('emulate a LIT then a screen write', () => {      
+            const screenAdapter = new Device();
+            const devices = [null, null, screenAdapter, null, null, null, null, null, null, null, null, null, null, null, null, null];
+            const uxn = new Uxn(devices);
+
+            const device = 32;
+            const port = 7;
+
+            // write the byte 0x43 to port 0x07 of device 0x20
+            uxn.emulate(`\x80\x43\x80${String.fromCharCode(device + port)}\x17`);
+            expect(screenAdapter.get(0x07)).toStrictEqual([0x43]);
         });
     });
 
