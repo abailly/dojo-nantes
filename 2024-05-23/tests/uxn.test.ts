@@ -4,9 +4,9 @@ type Program = string
 
 class Uxn {
     stack: any[]
-    devices: (Device | null)[]
+    devices: Devices
 
-    constructor (devices: (Device | null)[] = []) {
+    constructor (devices: Devices = new Devices()) {
         this.stack = []
 	this.devices = devices;
     }
@@ -40,7 +40,7 @@ class Uxn {
 		    const val = this.stack.pop();
 		    const deviceIndex = (0xf0 & device) >> 4;
 		    const port = 0x0f & device;
-		    const selectedDevice  = this.devices[deviceIndex];
+		    const selectedDevice  = this.devices.getDevice(deviceIndex);
 		    if (selectedDevice) {
 		    	selectedDevice.output(port, val);
 		    }	
@@ -52,7 +52,7 @@ class Uxn {
 
 class Device {
 
-	out : number[][] = [[], [], [], [], [], [], [], [], [], [], [], [], [], [], [], []] 
+	out : number[][] = Array(16).fill([])
 
         get (port : number) : number[] {
                 return this.out[port];
@@ -62,6 +62,25 @@ class Device {
 		this.out[port].unshift(value);
 	}
 
+}
+
+class Devices {
+  devices : (Device | null)[]
+
+ constructor () {	
+   this.devices = Array(16).fill(null);
+ }
+
+ getDevice(index: number) {
+	 return this.devices[index];
+ }
+
+ set console (device : Device) {
+	 this.devices[1] = device;
+ }
+ set screen (device : Device) {
+	 this.devices[2] = device;
+ }
 }
 
 describe('Uxn VM', () => {
@@ -100,7 +119,8 @@ describe('Uxn VM', () => {
 
         test('emulate a LIT then a console write', () => {      
             const consoleAdapter = new Device();
-            const devices = [null, consoleAdapter, null, null, null, null, null, null, null, null, null, null, null, null, null, null];
+            const devices = new Devices();
+	    devices.console = consoleAdapter;
             const uxn = new Uxn(devices);
 
             const device = 16;
@@ -114,7 +134,8 @@ describe('Uxn VM', () => {
 
         test('emulate a LIT then a screen write', () => {      
             const screenAdapter = new Device();
-            const devices = [null, null, screenAdapter, null, null, null, null, null, null, null, null, null, null, null, null, null];
+            const devices = new Devices();
+	    devices.screen = screenAdapter;
             const uxn = new Uxn(devices);
 
             const device = 32;
