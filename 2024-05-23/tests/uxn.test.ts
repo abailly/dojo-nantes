@@ -38,7 +38,7 @@ class Uxn {
                 case 0x17:
                     const device = this.stack.pop();
 		    const val = this.stack.pop();
-		    const deviceIndex = (0xf0 & device) >> 4;
+		    const deviceIndex = 0xf0 & device;
 		    const port = 0x0f & device;
 		    const selectedDevice  = this.devices.getDevice(deviceIndex);
 		    if (selectedDevice) {
@@ -64,22 +64,32 @@ class Device {
 
 }
 
+enum DeviceType {
+	CONSOLE = 16,
+        SCREEN = 32
+}
+
 class Devices {
-  devices : (Device | null)[]
+
+ devices : (Device | null)[]
 
  constructor () {	
    this.devices = Array(16).fill(null);
  }
+ 
+ private deviceIndex(deviceType : DeviceType) : number {
+    return deviceType >> 4;
+ }
 
- getDevice(index: number) {
-	 return this.devices[index];
+ getDevice(deviceType: DeviceType) {
+	 return this.devices[this.deviceIndex(deviceType)];
  }
 
  set console (device : Device) {
-	 this.devices[1] = device;
+	 this.devices[this.deviceIndex(DeviceType.CONSOLE)] = device;
  }
  set screen (device : Device) {
-	 this.devices[2] = device;
+	 this.devices[this.deviceIndex(DeviceType.SCREEN)] = device;
  }
 }
 
@@ -120,10 +130,10 @@ describe('Uxn VM', () => {
         test('emulate a LIT then a console write', () => {      
             const consoleAdapter = new Device();
             const devices = new Devices();
-	    devices.console = consoleAdapter;
             const uxn = new Uxn(devices);
+	    devices.console = consoleAdapter;
 
-            const device = 16;
+            const device = DeviceType.CONSOLE;
             const port = 8;
 
             // write the byte 0x43 to port 0x08 of device 0x10
@@ -135,10 +145,10 @@ describe('Uxn VM', () => {
         test('emulate a LIT then a screen write', () => {      
             const screenAdapter = new Device();
             const devices = new Devices();
-	    devices.screen = screenAdapter;
             const uxn = new Uxn(devices);
+	    devices.screen = screenAdapter;
 
-            const device = 32;
+            const device = DeviceType.SCREEN;
             const port = 7;
 
             // write the byte 0x43 to port 0x07 of device 0x20
