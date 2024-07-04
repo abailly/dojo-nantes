@@ -46,4 +46,13 @@ describe("when", () => {
 
         expect(vm.pop()).toEqual(0x42);
     });
+
+    it('assert subroutine returns some value', () => {
+        const vm = new VM();
+        const subroutine = `\x80\x12`;
+        const program = '\x80\x04\x0e\x80\x12\x08' + subroutine + '\x6d';
+        vm.execute(program);
+
+        expect(vm.pop()).toEqual(0x01);
+    })
 });
