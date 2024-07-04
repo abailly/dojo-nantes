@@ -10,6 +10,13 @@ export class VM {
                 case 0x02:
                     this.stack.pop();
                     break;
+                case 0x08:
+                    if (this.stack.pop() === this.stack.pop()) {
+                        this.stack.push(0x01);
+                    } else {
+                        this.stack.push(0x00);
+                    }
+                    break;
                 case 0x16: {
                     const port = this.stack.pop() ?? 0;
                     this.stack.push(this.device.input(port));

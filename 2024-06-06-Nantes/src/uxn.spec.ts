@@ -1,4 +1,4 @@
-import { VM, VMDevice } from "./vm";
+import { VM } from "./vm";
 
 describe("when", () => {
     [0x12, 0x13].forEach((value) =>
@@ -47,12 +47,36 @@ describe("when", () => {
         expect(vm.pop()).toEqual(0x42);
     });
 
-    it('assert subroutine returns some value', () => {
+    // high level first test for our "test framework"
+    // it('assert subroutine returns some value', () => {
+    //     const vm = new VM();
+    //     const subroutine = `\x80\x12`;
+    //     const program = '\x80\x04\x0e\x80\x12\x08' + subroutine + '\x6d';
+    //     vm.execute(program);
+
+    //     expect(vm.pop()).toEqual(0x01);
+    // });
+
+    // to test
+    // note that JSR and JMP2r work on the return stack
+    // 1. EQU = 0x08
+    // 2. JSR = 0x0e
+    // 3. JMP2r = 0x6d
+
+    it('EQU pushes 1 if 2 top bytes are equal', () => {
         const vm = new VM();
-        const subroutine = `\x80\x12`;
-        const program = '\x80\x04\x0e\x80\x12\x08' + subroutine + '\x6d';
+        const program = '\x80\x12\x80\x12\x08';
         vm.execute(program);
 
         expect(vm.pop()).toEqual(0x01);
+    });
+
+    it('EQU pushes 0 if 2 top bytes are different', () => {
+        const vm = new VM();
+        const program = '\x80\x12\x80\x13\x08';
+        vm.execute(program);
+
+        expect(vm.pop()).toEqual(0x00);
     })
+
 });
