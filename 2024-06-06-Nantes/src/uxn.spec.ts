@@ -47,20 +47,6 @@ describe("when", () => {
         expect(vm.pop()).toEqual(0x42);
     });
 
-    // high level first test for our "test framework"
-    // it('assert subroutine returns some value', () => {
-    //     const vm = new VM();
-    //     const subroutine = `\x80\x12`;
-    //     const program = '\x80\x04\x0e\x80\x12\x08' + subroutine + '\x6d';
-    //     vm.execute(program);
-
-    //     expect(vm.pop()).toEqual(0x01);
-    // });
-
-    // to test
-    // note that JSR and JMP2r work on the return stack
-    // 2. JSR = 0x0e
-    // 3. JMP2r = 0x6d
 
     it('EQU pushes 1 if 2 top bytes are equal', () => {
         const vm = new VM();
@@ -101,4 +87,27 @@ describe("when", () => {
 
         expect(vm.pop()).toEqual(0x13);
     })
+
+    it('BRK stops execution of program', () => {
+        const vm = new VM();
+        const program = `\x80\x12\x00\x01`;
+        vm.execute(program);
+
+        expect(vm.pop()).toEqual(0x12);
+    })
+
+    // high level first test for our "test framework"
+    it('assert subroutine returns some value', () => {
+        const vm = new VM();
+        const subroutine = `\x80\x12`;
+        const program = '\x80\x05\x0e\x80\x12\x08\x00' + subroutine + '\x6c';
+        vm.execute(program);
+
+        expect(vm.pop()).toEqual(0x01);
+    });
+
+    // to test
+    // note that JSR and JMP2r work on the return stack
+    // 2. JSR = 0x0e
+    // 3. JMP2r = 0x6d
 });

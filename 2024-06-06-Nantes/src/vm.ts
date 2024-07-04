@@ -1,9 +1,12 @@
 export class VM {
     stack: number[] = [];
+    returnStack: number[] = [];
     device: VMDevice;
     execute(program: string) {
         for (var i = 0; i < program.length; i++) {
             switch (program.charCodeAt(i)) {
+                case 0x00:
+                    return;
                 case 0x01: {
                     const a = this.stack.pop() ?? 0;
                     this.stack.push(a + 1);
@@ -21,6 +24,9 @@ export class VM {
                     break;
                 case 0x0e: {
                     const addr = this.stack.pop() ?? 0;
+                    // TODO handles programs larger than 256 bytes
+                    this.returnStack.push(0);
+                    this.returnStack.push(i + 1);
                     i = i + addr;
                     break;
                 }
@@ -33,6 +39,13 @@ export class VM {
                     const port = this.stack.pop() ?? 0;
                     const value = this.stack.pop() ?? 0;
                     this.device.output(port, value);
+                    break;
+                }
+                case 0x6c: {
+                    const a = this.returnStack.pop() ?? 0;
+                    const b = this.returnStack.pop() ?? 0;
+                    i = b << 8 | a;
+                    console.log(i);
                     break;
                 }
                 case 0x80:
