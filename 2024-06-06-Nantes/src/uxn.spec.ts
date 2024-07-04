@@ -1,4 +1,4 @@
-import { VM } from "./vm";
+import { VM, VMDevice } from "./vm";
 
 describe("when", () => {
     [0x12, 0x13].forEach((value) =>
@@ -59,7 +59,6 @@ describe("when", () => {
 
     // to test
     // note that JSR and JMP2r work on the return stack
-    // 1. EQU = 0x08
     // 2. JSR = 0x0e
     // 3. JMP2r = 0x6d
 
@@ -79,4 +78,27 @@ describe("when", () => {
         expect(vm.pop()).toEqual(0x00);
     })
 
+    it('INC increments top byte', () => {
+        const vm = new VM();
+        const program = '\x80\x12\x01';
+        vm.execute(program);
+
+        expect(vm.pop()).toEqual(0x13);
+    });
+
+    it('INC increments top byte several times', () => {
+        const vm = new VM();
+        const program = '\x80\x12\x01\x01';
+        vm.execute(program);
+
+        expect(vm.pop()).toEqual(0x14);
+    });
+
+    it('JSR jumps execution forward given a value on stack', () => {
+        const vm = new VM();
+        const program = `\x80\x12\x80\x02\x0e\x01\x01\x01`;
+        vm.execute(program);
+
+        expect(vm.pop()).toEqual(0x13);
+    })
 });

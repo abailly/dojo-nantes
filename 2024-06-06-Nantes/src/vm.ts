@@ -4,9 +4,11 @@ export class VM {
     execute(program: string) {
         for (var i = 0; i < program.length; i++) {
             switch (program.charCodeAt(i)) {
-                case 0x80:
-                    this.stack.push(program.charCodeAt(++i));
+                case 0x01: {
+                    const a = this.stack.pop() ?? 0;
+                    this.stack.push(a + 1);
                     break;
+                }
                 case 0x02:
                     this.stack.pop();
                     break;
@@ -17,6 +19,11 @@ export class VM {
                         this.stack.push(0x00);
                     }
                     break;
+                case 0x0e: {
+                    const addr = this.stack.pop() ?? 0;
+                    i = i + addr;
+                    break;
+                }
                 case 0x16: {
                     const port = this.stack.pop() ?? 0;
                     this.stack.push(this.device.input(port));
@@ -28,9 +35,13 @@ export class VM {
                     this.device.output(port, value);
                     break;
                 }
+                case 0x80:
+                    this.stack.push(program.charCodeAt(++i));
+                    break;
             }
         }
     }
+    // NOTE: stacks are circular so it's always possible to pop a value
     pop(): number | undefined {
         return this.stack.pop();
     }
