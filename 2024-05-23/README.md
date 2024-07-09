@@ -39,3 +39,11 @@ On continue la VM Uxn en Typescript
 ## Quoi ?
 
 * https://wiki.xxiivv.com/site/uxn.html
+
+NOTE:
+
+Pour installer `nvm` qui permet d'installer node  
+
+```
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+```

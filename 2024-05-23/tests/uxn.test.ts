@@ -10,31 +10,44 @@ class Uxn {
         this.stack = []
 	this.devices = devices;
     }
+    
+    inc() {
+	this.stack[this.stack.length-1]++;
+    }
 
     lit(param: number) {
         this.stack.push(param);
-        return this;
     }
     
     pop() {
         this.stack.pop();
-        return this;
     }
 
     add() {
         this.stack.push(this.stack.pop() + this.stack.pop());
-        return this;
+    }
+
+    nip () {
+	this.stack.splice(this.stack.length -2, 1);
     }
 
     emulate (program : Program)  {
         for (var i = 0; i< program.length; i++) {
             switch(program.charCodeAt(i)) {
+                case 0x00: 
+                    return;
                 case 0x80: 
                     this.lit(program.charCodeAt(++i));
+                    break;
+                case 0x01:
+                    this.inc();
                     break;
                 case 0x02:
                     this.pop();
                     break;
+                case 0x03:
+		    this.nip();
+		    break;
                 case 0x17:
                     const device = this.stack.pop();
 		    const val = this.stack.pop();
@@ -45,9 +58,20 @@ class Uxn {
 		    	selectedDevice.output(port, val);
 		    }	
                     break;
+                case 0x18: {
+		    this.add();
+		    break;
+		}
+		    
             }
         }
     }
+}
+
+class Stopped extends Uxn { 
+   inc () { 
+	   return this;
+   }
 }
 
 class Device {
@@ -94,26 +118,6 @@ class Devices {
 }
 
 describe('Uxn VM', () => {
-    [42, 43].forEach((v) => {
-        test(`LITeral ${v}`, () => {
-            const uxn = new Uxn();
-            uxn.lit(v)
-            expect(uxn.stack).toStrictEqual([v]);
-        });
-    });
-
-    test('POP', () => {
-        const uxn = new Uxn();
-        uxn.lit(0x42).pop();
-        expect(uxn.stack).toStrictEqual([]);
-    });
-
-    test('ADD', () =>{
-        const uxn = new Uxn();
-        uxn.lit(12).lit(13).add();
-        expect(uxn.stack).toStrictEqual([25]);
-    });
-
     describe('bytecode', () => {
         test('emulate a LIT of a value', () => {
             const uxn = new Uxn();
@@ -142,6 +146,18 @@ describe('Uxn VM', () => {
             expect(uxn.stack).toStrictEqual([]);
         });
 
+	test('emulate a BRK command', () => {
+            const uxn = new Uxn();
+            uxn.emulate('\x80\x43\x01\x00\x01');
+            expect(uxn.stack).toStrictEqual([0x44]);
+	});
+
+	test('emulate a INC command', () => {
+            const uxn = new Uxn();
+            uxn.emulate('\x80\x43\x01');
+            expect(uxn.stack).toStrictEqual([0x44]);
+	});
+
         test('emulate a LIT then a screen write', () => {      
             const screenAdapter = new Device();
             const devices = new Devices();
@@ -155,6 +171,22 @@ describe('Uxn VM', () => {
             uxn.emulate(`\x80\x43\x80${String.fromCharCode(device + port)}\x17`);
             expect(screenAdapter.get(0x07)).toStrictEqual([0x43]);
         });
-    });
 
+	test('emulate a NIP command', () => {
+            const uxn = new Uxn();
+            uxn.emulate('\x80\x43\x80\x42\x03');
+            expect(uxn.stack).toStrictEqual([0x42]);
+	});
+	test('emulate a NIP command', () => {
+            const uxn = new Uxn();
+            uxn.emulate('\x80\x43\x80\x42\x03');
+            expect(uxn.stack).toStrictEqual([0x42]);
+	});
+        test('emulate a ADD of 2 values', () => {
+            const uxn = new Uxn();
+            uxn.emulate('\x80\x43\x80\x42\x18');
+            expect(uxn.stack).toStrictEqual([0x85]);
+        });
+
+    });
 });
