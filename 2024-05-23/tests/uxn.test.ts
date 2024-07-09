@@ -31,6 +31,10 @@ class Uxn {
 	this.stack.splice(this.stack.length -2, 1);
     }
 
+    swap () {
+	this.stack.push.apply(this.stack, this.stack.splice(this.stack.length -2, 1));
+    }
+
     emulate (program : Program)  {
         for (var i = 0; i< program.length; i++) {
             switch(program.charCodeAt(i)) {
@@ -47,6 +51,9 @@ class Uxn {
                     break;
                 case 0x03:
 		    this.nip();
+		    break;
+                case 0x04:
+		    this.swap();
 		    break;
                 case 0x17:
                     const device = this.stack.pop();
@@ -66,12 +73,6 @@ class Uxn {
             }
         }
     }
-}
-
-class Stopped extends Uxn { 
-   inc () { 
-	   return this;
-   }
 }
 
 class Device {
@@ -186,6 +187,12 @@ describe('Uxn VM', () => {
             const uxn = new Uxn();
             uxn.emulate('\x80\x43\x80\x42\x18');
             expect(uxn.stack).toStrictEqual([0x85]);
+        });
+
+        test('emulate a SWP of 2 values', () => {
+            const uxn = new Uxn();
+            uxn.emulate('\x80\x43\x80\x42\x04');
+            expect(uxn.stack).toStrictEqual([0x42, 0x43]);
         });
 
     });
