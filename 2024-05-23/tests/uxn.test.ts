@@ -35,6 +35,13 @@ class Uxn {
 	this.stack.push.apply(this.stack, this.stack.splice(this.stack.length -2, 1));
     }
 
+    rot () {
+        const c = this.stack.pop();
+	const b = this.stack.pop();
+	const a = this.stack.pop();
+	this.stack.push(b, c, a);
+    }
+
     emulate (program : Program)  {
         for (var i = 0; i< program.length; i++) {
             switch(program.charCodeAt(i)) {
@@ -54,6 +61,9 @@ class Uxn {
 		    break;
                 case 0x04:
 		    this.swap();
+		    break;
+		case 0x05:
+		    this.rot();
 		    break;
                 case 0x17:
                     const device = this.stack.pop();
@@ -178,11 +188,13 @@ describe('Uxn VM', () => {
             uxn.emulate('\x80\x43\x80\x42\x03');
             expect(uxn.stack).toStrictEqual([0x42]);
 	});
+
 	test('emulate a NIP command', () => {
             const uxn = new Uxn();
             uxn.emulate('\x80\x43\x80\x42\x03');
             expect(uxn.stack).toStrictEqual([0x42]);
 	});
+
         test('emulate a ADD of 2 values', () => {
             const uxn = new Uxn();
             uxn.emulate('\x80\x43\x80\x42\x18');
@@ -195,5 +207,10 @@ describe('Uxn VM', () => {
             expect(uxn.stack).toStrictEqual([0x42, 0x43]);
         });
 
+	test('emulate a ROT of 3 values', () => {
+	    const uxn = new Uxn();
+	    uxn.emulate('\x80\x43\x80\x42\x80\x41\x05');
+	    expect(uxn.stack).toStrictEqual([0x42, 0x41, 0x43]);
+	});
     });
 });
