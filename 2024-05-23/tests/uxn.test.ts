@@ -130,18 +130,6 @@ class Devices {
 
 describe('Uxn VM', () => {
     describe('bytecode', () => {
-        test('emulate a LIT of a value', () => {
-            const uxn = new Uxn();
-            uxn.emulate('\x80\x42');
-            expect(uxn.stack).toStrictEqual([0x42]);
-        });
-
-        test('emulate a LIT of a value then a POP', () => {
-            const uxn = new Uxn();
-            uxn.emulate('\x80\x43\x02');
-            expect(uxn.stack).toStrictEqual([]);
-        });
-
         test('emulate a LIT then a console write', () => {      
             const consoleAdapter = new Device();
             const devices = new Devices();
@@ -157,18 +145,6 @@ describe('Uxn VM', () => {
             expect(uxn.stack).toStrictEqual([]);
         });
 
-	test('emulate a BRK command', () => {
-            const uxn = new Uxn();
-            uxn.emulate('\x80\x43\x01\x00\x01');
-            expect(uxn.stack).toStrictEqual([0x44]);
-	});
-
-	test('emulate a INC command', () => {
-            const uxn = new Uxn();
-            uxn.emulate('\x80\x43\x01');
-            expect(uxn.stack).toStrictEqual([0x44]);
-	});
-
         test('emulate a LIT then a screen write', () => {      
             const screenAdapter = new Device();
             const devices = new Devices();
@@ -183,34 +159,21 @@ describe('Uxn VM', () => {
             expect(screenAdapter.get(0x07)).toStrictEqual([0x43]);
         });
 
-	test('emulate a NIP command', () => {
-            const uxn = new Uxn();
-            uxn.emulate('\x80\x43\x80\x42\x03');
-            expect(uxn.stack).toStrictEqual([0x42]);
-	});
-
-	test('emulate a NIP command', () => {
-            const uxn = new Uxn();
-            uxn.emulate('\x80\x43\x80\x42\x03');
-            expect(uxn.stack).toStrictEqual([0x42]);
-	});
-
-        test('emulate a ADD of 2 values', () => {
-            const uxn = new Uxn();
-            uxn.emulate('\x80\x43\x80\x42\x18');
-            expect(uxn.stack).toStrictEqual([0x85]);
-        });
-
-        test('emulate a SWP of 2 values', () => {
-            const uxn = new Uxn();
-            uxn.emulate('\x80\x43\x80\x42\x04');
-            expect(uxn.stack).toStrictEqual([0x42, 0x43]);
-        });
-
-	test('emulate a ROT of 3 values', () => {
-	    const uxn = new Uxn();
-	    uxn.emulate('\x80\x43\x80\x42\x80\x41\x05');
-	    expect(uxn.stack).toStrictEqual([0x42, 0x41, 0x43]);
+        ([
+          ["emulate a LIT of a value", "\x80\x42", [0x42]],
+          ["emulate a LIT of a value then a POP", "\x80\x43\x02", []],
+          ["emulate a BRK command", "\x80\x43\x01\x00\x01", [0x44]],
+          ["emulate a INC command", "\x80\x43\x01", [0x44]],
+          ["emulate a NIP command", "\x80\x43\x80\x42\x03", [0x42]],
+          ["emulate a ADD of 2 values", "\x80\x43\x80\x42\x18", [0x85]],
+          ["emulate a SWP of 2 values", "\x80\x43\x80\x42\x04", [0x42, 0x43]],
+          ["emulate a ROT of 3 values", "\x80\x43\x80\x42\x80\x41\x05", [0x42, 0x41, 0x43]],
+        ] as [string, string, number[]][]).forEach(([message, bytecode, stack]) => {
+          test(message, () => {
+              const uxn = new Uxn();
+              uxn.emulate(bytecode);
+              expect(uxn.stack).toStrictEqual(stack);
+          });
 	});
     });
 });
