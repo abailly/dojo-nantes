@@ -175,5 +175,21 @@ describe('Uxn VM', () => {
               expect(uxn.stack).toStrictEqual(stack);
           });
 	});
+
+        test('emulate a JMP', () => {
+	    const uxn = new Uxn();
+	    uxn.emulate('\x80\x02\x0c\x80\x01\x80\x02'); // STACK : 0x01
+	    expect(uxn.stack).toStrictEqual([0x02, 0x02]);
+	    expect(uxn.program_counter).toStrictEqual(0x8);
+	});
     });
 });
+
+
+/** idée du test ci-dessus, à vérifier sur une implementation d'UXN qui fonctionne
+LIT 02 <- 2 bytes
+JMP    <- @ 0x2
+LIT 01
+LIT 02 <- @ 0x5
+???  <- @ 0x8
+*/
