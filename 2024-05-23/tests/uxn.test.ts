@@ -5,20 +5,22 @@ type Program = string
 class Uxn {
     stack: any[]
     devices: Devices
+    program_counter: number
 
     constructor (devices: Devices = new Devices()) {
         this.stack = []
-	this.devices = devices;
+	      this.devices = devices;
+        this.program_counter = 0;
     }
-    
+
     inc() {
-	this.stack[this.stack.length-1]++;
+	      this.stack[this.stack.length-1]++;
     }
 
     lit(param: number) {
         this.stack.push(param);
     }
-    
+
     pop() {
         this.stack.pop();
     }
@@ -43,12 +45,13 @@ class Uxn {
     }
 
     emulate (program : Program)  {
-        for (var i = 0; i< program.length; i++) {
-            switch(program.charCodeAt(i)) {
-                case 0x00: 
+        while (this.program_counter < program.length) {
+            switch(program.charCodeAt(this.program_counter)) {
+                case 0x00:
                     return;
-                case 0x80: 
-                    this.lit(program.charCodeAt(++i));
+                case 0x80:
+                    this.program_counter += 1;
+                    this.lit(program.charCodeAt(this.program_counter));
                     break;
                 case 0x01:
                     this.inc();
@@ -56,31 +59,36 @@ class Uxn {
                 case 0x02:
                     this.pop();
                     break;
+                case 0x0c:
+                    const offset = this.stack.pop();
+                    this.program_counter += offset;
+                    break;
                 case 0x03:
-		    this.nip();
-		    break;
+		                this.nip();
+		                break;
                 case 0x04:
-		    this.swap();
-		    break;
-		case 0x05:
-		    this.rot();
-		    break;
+		                this.swap();
+		                break;
+		            case 0x05:
+		                this.rot();
+		                break;
                 case 0x17:
                     const device = this.stack.pop();
-		    const val = this.stack.pop();
-		    const deviceIndex = 0xf0 & device;
-		    const port = 0x0f & device;
-		    const selectedDevice  = this.devices.getDevice(deviceIndex);
-		    if (selectedDevice) {
-		    	selectedDevice.output(port, val);
-		    }	
+		                const val = this.stack.pop();
+		                const deviceIndex = 0xf0 & device;
+		                const port = 0x0f & device;
+		                const selectedDevice  = this.devices.getDevice(deviceIndex);
+		                if (selectedDevice) {
+		    	              selectedDevice.output(port, val);
+		                }
                     break;
                 case 0x18: {
-		    this.add();
-		    break;
-		}
-		    
+		                this.add();
+		                break;
+		            }
+
             }
+            this.program_counter += 1;
         }
     }
 }
@@ -108,10 +116,10 @@ class Devices {
 
  devices : (Device | null)[]
 
- constructor () {	
+ constructor () {
    this.devices = Array(16).fill(null);
  }
- 
+
  private deviceIndex(deviceType : DeviceType) : number {
     return deviceType >> 4;
  }
@@ -130,7 +138,7 @@ class Devices {
 
 describe('Uxn VM', () => {
     describe('bytecode', () => {
-        test('emulate a LIT then a console write', () => {      
+        test('emulate a LIT then a console write', () => {
             const consoleAdapter = new Device();
             const devices = new Devices();
             const uxn = new Uxn(devices);
@@ -145,7 +153,7 @@ describe('Uxn VM', () => {
             expect(uxn.stack).toStrictEqual([]);
         });
 
-        test('emulate a LIT then a screen write', () => {      
+        test('emulate a LIT then a screen write', () => {
             const screenAdapter = new Device();
             const devices = new Devices();
             const uxn = new Uxn(devices);
@@ -176,20 +184,11 @@ describe('Uxn VM', () => {
           });
 	});
 
-        test('emulate a JMP', () => {
+    test('emulate a JMP', () => {
 	    const uxn = new Uxn();
-	    uxn.emulate('\x80\x02\x0c\x80\x01\x80\x02'); // STACK : 0x01
-	    expect(uxn.stack).toStrictEqual([0x02, 0x02]);
-	    expect(uxn.program_counter).toStrictEqual(0x8);
+	    uxn.emulate('\x80\x02\x0c\x80\x01\x80\x03');
+	    expect(uxn.stack).toStrictEqual([0x03]);
+	    expect(uxn.program_counter).toStrictEqual(0x07);
 	});
     });
 });
-
-
-/** idée du test ci-dessus, à vérifier sur une implementation d'UXN qui fonctionne
-LIT 02 <- 2 bytes
-JMP    <- @ 0x2
-LIT 01
-LIT 02 <- @ 0x5
-???  <- @ 0x8
-*/
