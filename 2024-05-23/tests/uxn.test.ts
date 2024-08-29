@@ -187,7 +187,7 @@ describe('Uxn VM', () => {
               uxn.emulate(bytecode);
               expect(uxn.stack).toStrictEqual(stack);
           });
-	});
+	      });
 
         test('emulate a JMP', () => {
 	          const uxn = new Uxn();
@@ -202,5 +202,18 @@ describe('Uxn VM', () => {
 	          expect(uxn.stack).toStrictEqual([]);
 	          expect(uxn.return_stack).toStrictEqual([0x02]);
 	      });
+
+        test('emulate a JSR', () => {
+	          const uxn = new Uxn();
+	          uxn.emulate('\x80\x02\x0e\0x80\0x01\0x80\0x03');
+            // #03
+            // JSR
+            // #03
+            // BRK
+            // #04
+            // JMP2r
+            // #05
+            //
+            // … c'est évalué en     WST 00 00 00 00 00 00 |04 03 <
+        });
     });
-});
