@@ -4,11 +4,13 @@ type Program = string
 
 class Uxn {
     stack: any[]
+    return_stack: any[]
     devices: Devices
     program_counter: number
 
     constructor (devices: Devices = new Devices()) {
         this.stack = []
+        this.return_stack = []
 	      this.devices = devices;
         this.program_counter = 0;
     }
@@ -49,19 +51,11 @@ class Uxn {
             switch(program.charCodeAt(this.program_counter)) {
                 case 0x00:
                     return;
-                case 0x80:
-                    this.program_counter += 1;
-                    this.lit(program.charCodeAt(this.program_counter));
-                    break;
                 case 0x01:
                     this.inc();
                     break;
                 case 0x02:
                     this.pop();
-                    break;
-                case 0x0c:
-                    const offset = this.stack.pop();
-                    this.program_counter += offset;
                     break;
                 case 0x03:
 		                this.nip();
@@ -72,6 +66,14 @@ class Uxn {
 		            case 0x05:
 		                this.rot();
 		                break;
+                case 0x0c:
+                    const offset = this.stack.pop();
+                    this.program_counter += offset;
+                    break;
+                case 0x0f:
+                    const value = this.stack.pop();
+                    this.return_stack.push(value);
+                    break;
                 case 0x17:
                     const device = this.stack.pop();
 		                const val = this.stack.pop();
@@ -82,10 +84,13 @@ class Uxn {
 		    	              selectedDevice.output(port, val);
 		                }
                     break;
-                case 0x18: {
+                case 0x18:
 		                this.add();
 		                break;
-		            }
+                case 0x80:
+                    this.program_counter += 1;
+                    this.lit(program.charCodeAt(this.program_counter));
+                    break;
 
             }
             this.program_counter += 1;
@@ -184,11 +189,18 @@ describe('Uxn VM', () => {
           });
 	});
 
-    test('emulate a JMP', () => {
-	    const uxn = new Uxn();
-	    uxn.emulate('\x80\x02\x0c\x80\x01\x80\x03');
-	    expect(uxn.stack).toStrictEqual([0x03]);
-	    expect(uxn.program_counter).toStrictEqual(0x07);
-	});
+        test('emulate a JMP', () => {
+	          const uxn = new Uxn();
+	          uxn.emulate('\x80\x02\x0c\x80\x01\x80\x03');
+	          expect(uxn.stack).toStrictEqual([0x03]);
+	          expect(uxn.program_counter).toStrictEqual(0x07);
+	      });
+
+        test('emulate a STH', () => {
+	          const uxn = new Uxn();
+	          uxn.emulate('\x80\x02\x0f');
+	          expect(uxn.stack).toStrictEqual([]);
+	          expect(uxn.return_stack).toStrictEqual([0x02]);
+	      });
     });
 });
