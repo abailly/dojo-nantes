@@ -111,5 +111,12 @@ describe("when", () => {
     });
 
 
+    it('JMP shifts PC by some amount', () => {
+        const vm = new VM();
+        const program = `\x80\x12\x80\x01\x0c\x01\x00`;
+        execute(vm, program);
+
+        expect(vm.pop()).toEqual(0x12);
+    })
 
 });

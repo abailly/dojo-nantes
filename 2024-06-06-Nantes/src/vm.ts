@@ -3,6 +3,7 @@ enum OpCode {
     INC = 0x01,
     POP = 0x02,
     EQU = 0x08,
+    JMP = 0x0c,
     JSR = 0x0e,
     DEI = 0x16,
     DEO = 0x17,
@@ -39,6 +40,11 @@ export class VM {
                         this.stack.push(0x00);
                     }
                     break;
+                case OpCode.JMP: {
+                    const addr = this.stack.pop() ?? 0;
+                    this.pc += addr;
+                    break;
+                }
                 case OpCode.JSR: {
                     const addr = this.stack.pop() ?? 0;
                     // TODO handles programs larger than 256 bytes
@@ -68,6 +74,9 @@ export class VM {
                     this.stack.push(program.charCodeAt(++this.pc));
                     break;
             }
+            // TODO: as the memory of a UXN vm is circular, we should wrap the PC when
+            // reaching max amount of 64kB. This means that a program can run forever
+            // or rewrite part of itself, or whatever without any error
             this.pc++;
         }
     }
