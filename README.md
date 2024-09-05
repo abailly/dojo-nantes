@@ -29,6 +29,8 @@ Un dojo de code – coding dojo – est un lieu où pratiquer et apprendre à co
 
 ## 2024
 
+* Sessions du 5 septembre 2024
+  * [Nantes](2024-06-06-Nantes): Encore la machine Uxn
 * Sessions du 29 août 2024
   * [Distanciel](2024-05-23): Encore la machine Uxn
 * Sessions du 18 juillet 2024

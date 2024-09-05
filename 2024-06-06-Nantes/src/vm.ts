@@ -1,3 +1,15 @@
+enum OpCode {
+    BRK = 0x00,
+    INC = 0x01,
+    POP = 0x02,
+    EQU = 0x08,
+    JSR = 0x0e,
+    DEI = 0x16,
+    DEO = 0x17,
+    JMP2r = 0x6c,
+    LIT = 0x80,
+}
+
 export class VM {
     stack: number[] = [];
     returnStack: number[] = [];
@@ -5,24 +17,24 @@ export class VM {
     execute(program: string) {
         for (var i = 0; i < program.length; i++) {
             switch (program.charCodeAt(i)) {
-                case 0x00:
+                case OpCode.BRK:
                     return;
-                case 0x01: {
+                case OpCode.INC: {
                     const a = this.stack.pop() ?? 0;
                     this.stack.push(a + 1);
                     break;
                 }
-                case 0x02:
+                case OpCode.POP:
                     this.stack.pop();
                     break;
-                case 0x08:
+                case OpCode.EQU:
                     if (this.stack.pop() === this.stack.pop()) {
                         this.stack.push(0x01);
                     } else {
                         this.stack.push(0x00);
                     }
                     break;
-                case 0x0e: {
+                case OpCode.JSR: {
                     const addr = this.stack.pop() ?? 0;
                     // TODO handles programs larger than 256 bytes
                     this.returnStack.push(0);
@@ -30,25 +42,25 @@ export class VM {
                     i = i + addr;
                     break;
                 }
-                case 0x16: {
+                case OpCode.DEI: {
                     const port = this.stack.pop() ?? 0;
                     this.stack.push(this.device.input(port));
                     break;
                 }
-                case 0x17: {
+                case OpCode.DEO: {
                     const port = this.stack.pop() ?? 0;
                     const value = this.stack.pop() ?? 0;
                     this.device.output(port, value);
                     break;
                 }
-                case 0x6c: {
+                case OpCode.JMP2r: {
                     const a = this.returnStack.pop() ?? 0;
                     const b = this.returnStack.pop() ?? 0;
                     i = b << 8 | a;
                     console.log(i);
                     break;
                 }
-                case 0x80:
+                case OpCode.LIT:
                     this.stack.push(program.charCodeAt(++i));
                     break;
             }
