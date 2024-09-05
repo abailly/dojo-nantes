@@ -106,8 +106,6 @@ describe("when", () => {
         expect(vm.pop()).toEqual(0x01);
     });
 
-    // to test
-    // note that JSR and JMP2r work on the return stack
-    // 2. JSR = 0x0e
-    // 3. JMP2r = 0x6d
+
+
 });

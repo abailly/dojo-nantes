@@ -12,11 +12,16 @@ enum OpCode {
 
 export class VM {
     stack: number[] = [];
+
     returnStack: number[] = [];
+
+    pc: number = 0;
+
     device: VMDevice;
+
     execute(program: string) {
-        for (var i = 0; i < program.length; i++) {
-            switch (program.charCodeAt(i)) {
+        while (true && this.pc < program.length) {
+            switch (program.charCodeAt(this.pc)) {
                 case OpCode.BRK:
                     return;
                 case OpCode.INC: {
@@ -38,8 +43,8 @@ export class VM {
                     const addr = this.stack.pop() ?? 0;
                     // TODO handles programs larger than 256 bytes
                     this.returnStack.push(0);
-                    this.returnStack.push(i + 1);
-                    i = i + addr;
+                    this.returnStack.push(this.pc + 1);
+                    this.pc = this.pc + addr;
                     break;
                 }
                 case OpCode.DEI: {
@@ -56,14 +61,14 @@ export class VM {
                 case OpCode.JMP2r: {
                     const a = this.returnStack.pop() ?? 0;
                     const b = this.returnStack.pop() ?? 0;
-                    i = b << 8 | a;
-                    console.log(i);
+                    this.pc = b << 8 | a;
                     break;
                 }
                 case OpCode.LIT:
-                    this.stack.push(program.charCodeAt(++i));
+                    this.stack.push(program.charCodeAt(++this.pc));
                     break;
             }
+            this.pc++;
         }
     }
     // NOTE: stacks are circular so it's always possible to pop a value
