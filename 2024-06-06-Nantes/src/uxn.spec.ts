@@ -1,11 +1,15 @@
 import { VM, VMDevice } from "./vm";
 
+let execute = (vm: VM, program: string) => {
+    vm.execute(program + '\x00');
+}
+
 describe("when", () => {
     [0x12, 0x13].forEach((value) =>
         it(`LIT should ${value} next byte in stack`, () => {
             const vm = new VM();
             const program = `\x80${String.fromCodePoint(value)}`;
-            vm.execute(program);
+            execute(vm, program);
 
             expect(vm.pop()).toBe(value);
         })
@@ -14,7 +18,7 @@ describe("when", () => {
     it(`Two LIT should push two bytes in stack`, () => {
         const vm = new VM();
         const program = `\x80\x12\x80\x13`;
-        vm.execute(program);
+        execute(vm, program);
 
         expect(vm.pop()).toBe(0x13);
         expect(vm.pop()).toBe(0x12);
@@ -23,7 +27,7 @@ describe("when", () => {
     it(`POP should pop one byte from stack`, () => {
         const vm = new VM();
         const program = `\x80\x12\x80\x13\x02`;
-        vm.execute(program);
+        execute(vm, program);
 
         expect(vm.pop()).toBe(0x12);
     });
@@ -32,7 +36,7 @@ describe("when", () => {
         const device = new VMDevice();
         const vm = new VM(device);
         const program = `\x80\x12\x80\x18\x17`;
-        vm.execute(program);
+        execute(vm, program);
 
         expect(device.get(0x08)).toEqual([0x12]);
     });
@@ -42,7 +46,7 @@ describe("when", () => {
         device.in = [0x42];
         const vm = new VM(device);
         const program = `\x80\x12\x16`;
-        vm.execute(program);
+        execute(vm, program);
 
         expect(vm.pop()).toEqual(0x42);
     });
@@ -51,7 +55,7 @@ describe("when", () => {
     it('EQU pushes 1 if 2 top bytes are equal', () => {
         const vm = new VM();
         const program = '\x80\x12\x80\x12\x08';
-        vm.execute(program);
+        execute(vm, program);
 
         expect(vm.pop()).toEqual(0x01);
     });
@@ -59,7 +63,7 @@ describe("when", () => {
     it('EQU pushes 0 if 2 top bytes are different', () => {
         const vm = new VM();
         const program = '\x80\x12\x80\x13\x08';
-        vm.execute(program);
+        execute(vm, program);
 
         expect(vm.pop()).toEqual(0x00);
     })
@@ -67,7 +71,7 @@ describe("when", () => {
     it('INC increments top byte', () => {
         const vm = new VM();
         const program = '\x80\x12\x01';
-        vm.execute(program);
+        execute(vm, program);
 
         expect(vm.pop()).toEqual(0x13);
     });
@@ -75,7 +79,7 @@ describe("when", () => {
     it('INC increments top byte several times', () => {
         const vm = new VM();
         const program = '\x80\x12\x01\x01';
-        vm.execute(program);
+        execute(vm, program);
 
         expect(vm.pop()).toEqual(0x14);
     });
@@ -83,7 +87,7 @@ describe("when", () => {
     it('JSR jumps execution forward given a value on stack', () => {
         const vm = new VM();
         const program = `\x80\x12\x80\x02\x0e\x01\x01\x01`;
-        vm.execute(program);
+        execute(vm, program);
 
         expect(vm.pop()).toEqual(0x13);
     })
@@ -91,7 +95,7 @@ describe("when", () => {
     it('BRK stops execution of program', () => {
         const vm = new VM();
         const program = `\x80\x12\x00\x01`;
-        vm.execute(program);
+        execute(vm, program);
 
         expect(vm.pop()).toEqual(0x12);
     })
@@ -101,7 +105,7 @@ describe("when", () => {
         const vm = new VM();
         const subroutine = `\x80\x12`;
         const program = '\x80\x05\x0e\x80\x12\x08\x00' + subroutine + '\x6c';
-        vm.execute(program);
+        execute(vm, program);
 
         expect(vm.pop()).toEqual(0x01);
     });

@@ -20,7 +20,7 @@ export class VM {
     device: VMDevice;
 
     execute(program: string) {
-        while (true && this.pc < program.length) {
+        while (true) {
             switch (program.charCodeAt(this.pc)) {
                 case OpCode.BRK:
                     return;
