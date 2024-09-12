@@ -32,21 +32,23 @@ class Uxn {
     }
 
     nip () {
-	this.stack.splice(this.stack.length -2, 1);
+	      this.stack.splice(this.stack.length -2, 1);
     }
 
     swap () {
-	this.stack.push.apply(this.stack, this.stack.splice(this.stack.length -2, 1));
+	      this.stack.push.apply(this.stack, this.stack.splice(this.stack.length -2, 1));
     }
 
     rot () {
         const c = this.stack.pop();
-	const b = this.stack.pop();
-	const a = this.stack.pop();
-	this.stack.push(b, c, a);
+	      const b = this.stack.pop();
+	      const a = this.stack.pop();
+	      this.stack.push(b, c, a);
     }
 
     emulate (program : Program)  {
+        // TODO: load program at address 0x0100
+        // TODO: set pc at 0x100
         while (this.program_counter < program.length) {
             switch(program.charCodeAt(this.program_counter)) {
                 case 0x00:
@@ -58,8 +60,8 @@ class Uxn {
                     this.pop();
                     break;
                 case 0x03:
-		                this.nip();
-		                break;
+		               this.nip();
+		               break;
                 case 0x04:
 		                this.swap();
 		                break;
@@ -72,8 +74,11 @@ class Uxn {
                     break;
                 case 0x0e: {
                     const offset = this.stack.pop();
-                    this.return_stack.push(0);
-                    this.return_stack.push(this.program_counter + 1);
+		    const ret = this.program_counter + 1;
+		    const reth = (ret >> 0x08) & 0xff;
+		    const retl = ret & 0xff;
+                    this.return_stack.push(reth);
+                    this.return_stack.push(retl);
                     this.program_counter += offset;
                     break;
                 }
@@ -106,45 +111,45 @@ class Uxn {
 
 class Device {
 
-	out : number[][] = Array(16).fill([])
+	  out : number[][] = Array(16).fill([])
 
-        get (port : number) : number[] {
-                return this.out[port];
-        }
+    get (port : number) : number[] {
+        return this.out[port];
+    }
 
-	output (port : number, value : number) {
-		this.out[port].unshift(value);
-	}
+	  output (port : number, value : number) {
+		    this.out[port].unshift(value);
+	  }
 
 }
 
 enum DeviceType {
-	CONSOLE = 16,
-        SCREEN = 32
+	  CONSOLE = 16,
+    SCREEN = 32
 }
 
 class Devices {
 
- devices : (Device | null)[]
+    devices : (Device | null)[]
 
- constructor () {
-   this.devices = Array(16).fill(null);
- }
+    constructor () {
+        this.devices = Array(16).fill(null);
+    }
 
- private deviceIndex(deviceType : DeviceType) : number {
-    return deviceType >> 4;
- }
+    private deviceIndex(deviceType : DeviceType) : number {
+        return deviceType >> 4;
+    }
 
- getDevice(deviceType: DeviceType) {
-	 return this.devices[this.deviceIndex(deviceType)];
- }
+    getDevice(deviceType: DeviceType) {
+	      return this.devices[this.deviceIndex(deviceType)];
+    }
 
- set console (device : Device) {
-	 this.devices[this.deviceIndex(DeviceType.CONSOLE)] = device;
- }
- set screen (device : Device) {
-	 this.devices[this.deviceIndex(DeviceType.SCREEN)] = device;
- }
+    set console (device : Device) {
+	      this.devices[this.deviceIndex(DeviceType.CONSOLE)] = device;
+    }
+    set screen (device : Device) {
+	      this.devices[this.deviceIndex(DeviceType.SCREEN)] = device;
+    }
 }
 
 describe('Uxn VM', () => {
@@ -179,20 +184,20 @@ describe('Uxn VM', () => {
         });
 
         ([
-          ["emulate a LIT of a value", "\x80\x42", [0x42]],
-          ["emulate a LIT of a value then a POP", "\x80\x43\x02", []],
-          ["emulate a BRK command", "\x80\x43\x01\x00\x01", [0x44]],
-          ["emulate a INC command", "\x80\x43\x01", [0x44]],
-          ["emulate a NIP command", "\x80\x43\x80\x42\x03", [0x42]],
-          ["emulate a ADD of 2 values", "\x80\x43\x80\x42\x18", [0x85]],
-          ["emulate a SWP of 2 values", "\x80\x43\x80\x42\x04", [0x42, 0x43]],
-          ["emulate a ROT of 3 values", "\x80\x43\x80\x42\x80\x41\x05", [0x42, 0x41, 0x43]],
+            ["emulate a LIT of a value", "\x80\x42", [0x42]],
+            ["emulate a LIT of a value then a POP", "\x80\x43\x02", []],
+            ["emulate a BRK command", "\x80\x43\x01\x00\x01", [0x44]],
+            ["emulate a INC command", "\x80\x43\x01", [0x44]],
+            ["emulate a NIP command", "\x80\x43\x80\x42\x03", [0x42]],
+            ["emulate a ADD of 2 values", "\x80\x43\x80\x42\x18", [0x85]],
+            ["emulate a SWP of 2 values", "\x80\x43\x80\x42\x04", [0x42, 0x43]],
+            ["emulate a ROT of 3 values", "\x80\x43\x80\x42\x80\x41\x05", [0x42, 0x41, 0x43]],
         ] as [string, string, number[]][]).forEach(([message, bytecode, stack]) => {
-          test(message, () => {
-              const uxn = new Uxn();
-              uxn.emulate(bytecode);
-              expect(uxn.stack).toStrictEqual(stack);
-          });
+            test(message, () => {
+                const uxn = new Uxn();
+                uxn.emulate(bytecode);
+                expect(uxn.stack).toStrictEqual(stack);
+            });
 	      });
 
         test('emulate a JMP', () => {
@@ -211,8 +216,14 @@ describe('Uxn VM', () => {
 
         test('emulate a JSR', () => {
 	          const uxn = new Uxn();
-	          uxn.emulate('\x80\x02\x0e\0x80\0x01\0x80\0x03');
-	          expect(uxn.return_stack).toStrictEqual([0x00, 0x03]);
+	          uxn.emulate('\x80\x00'.repeat(255) + '\x80\x01\x0e\x00\x80\x01');
+		  // 0x0000 : 0x80 0x00
+		  // ... (255 fois)
+		  // 0x01fe : 0x80 0x01 
+		  // 0x0200 : 0x0e     
+		  // 0x0201 : 0x00 <- l'addresse de cette instruction sur le return stack
+		  // 0x0202: 0x80 0x01
+	          expect(uxn.return_stack).toStrictEqual([0x02, 0x01]);
         });
     });
 });
