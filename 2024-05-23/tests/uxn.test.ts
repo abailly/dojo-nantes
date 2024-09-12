@@ -70,6 +70,13 @@ class Uxn {
                     const offset = this.stack.pop();
                     this.program_counter += offset;
                     break;
+                case 0x0e: {
+                    const offset = this.stack.pop();
+                    this.return_stack.push(0);
+                    this.return_stack.push(this.program_counter + 1);
+                    this.program_counter += offset;
+                    break;
+                }
                 case 0x0f:
                     const value = this.stack.pop();
                     this.return_stack.push(value);
@@ -91,7 +98,6 @@ class Uxn {
                     this.program_counter += 1;
                     this.lit(program.charCodeAt(this.program_counter));
                     break;
-
             }
             this.program_counter += 1;
         }
@@ -147,7 +153,7 @@ describe('Uxn VM', () => {
             const consoleAdapter = new Device();
             const devices = new Devices();
             const uxn = new Uxn(devices);
-	    devices.console = consoleAdapter;
+	          devices.console = consoleAdapter;
 
             const device = DeviceType.CONSOLE;
             const port = 8;
@@ -162,7 +168,7 @@ describe('Uxn VM', () => {
             const screenAdapter = new Device();
             const devices = new Devices();
             const uxn = new Uxn(devices);
-	    devices.screen = screenAdapter;
+	          devices.screen = screenAdapter;
 
             const device = DeviceType.SCREEN;
             const port = 7;
@@ -206,15 +212,7 @@ describe('Uxn VM', () => {
         test('emulate a JSR', () => {
 	          const uxn = new Uxn();
 	          uxn.emulate('\x80\x02\x0e\0x80\0x01\0x80\0x03');
-            // #03
-            // JSR
-            // #03
-            // BRK
-            // #04
-            // JMP2r
-            // #05
-            //
-            // … c'est évalué en     WST 00 00 00 00 00 00 |04 03 <
+	          expect(uxn.return_stack).toStrictEqual([0x00, 0x03]);
         });
     });
 });
