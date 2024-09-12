@@ -217,3 +217,4 @@ describe('Uxn VM', () => {
             // … c'est évalué en     WST 00 00 00 00 00 00 |04 03 <
         });
     });
+});
