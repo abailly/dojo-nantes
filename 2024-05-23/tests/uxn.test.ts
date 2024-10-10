@@ -99,6 +99,12 @@ class Uxn {
                 case 0x18:
 		                this.add();
 		                break;
+		case 0x6c:
+		    const retl = this.return_stack.pop();
+		    const reth = (this.return_stack.pop() << 0x08);
+		    const ret = retl + reth;
+		    this.program_counter = ret;
+		    continue;
                 case 0x80:
                     this.program_counter += 1;
                     this.lit(program.charCodeAt(this.program_counter));
@@ -225,5 +231,12 @@ describe('Uxn VM', () => {
 		  // 0x0202: 0x80 0x01
 	          expect(uxn.return_stack).toStrictEqual([0x02, 0x01]);
         });
+
+        test('emulate a subroutine', () => {
+	          const uxn = new Uxn();
+	          uxn.emulate('\x80\x03\x0e\x80\x03\x00\x80\x04\x6c\x80\x05');
+	          expect(uxn.stack).toStrictEqual([0x04, 0x03]);
+        });
+
     });
 });
