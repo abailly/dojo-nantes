@@ -19,8 +19,8 @@ class Uxn {
 	      this.stack[this.stack.length-1]++;
     }
 
-    lit(param: number) {
-        this.stack.push(param);
+    lit(param: number, stack: number[]) {
+        stack.push(param);
     }
 
     pop() {
@@ -50,7 +50,9 @@ class Uxn {
         // TODO: load program at address 0x0100
         // TODO: set pc at 0x100
         while (this.program_counter < program.length) {
-            switch(program.charCodeAt(this.program_counter)) {
+	    let opcode = program.charCodeAt(this.program_counter) 
+	    let op = { opcode };
+            switch(op.opcode) {
                 case 0x00:
                     return;
                 case 0x01:
@@ -107,7 +109,11 @@ class Uxn {
 		    continue;
                 case 0x80:
                     this.program_counter += 1;
-                    this.lit(program.charCodeAt(this.program_counter));
+                    this.lit(program.charCodeAt(this.program_counter), this.stack);
+                    break;
+                case 0xc0:
+                    this.program_counter += 1;
+                    this.lit(program.charCodeAt(this.program_counter), this.return_stack);
                     break;
             }
             this.program_counter += 1;
@@ -236,6 +242,12 @@ describe('Uxn VM', () => {
 	          const uxn = new Uxn();
 	          uxn.emulate('\x80\x03\x0e\x80\x03\x00\x80\x04\x6c\x80\x05');
 	          expect(uxn.stack).toStrictEqual([0x04, 0x03]);
+        });
+
+        test('handle r mode for LIT', () => {
+	          const uxn = new Uxn();
+	          uxn.emulate('\xc0\x03');
+	          expect(uxn.return_stack).toStrictEqual([0x03]);
         });
 
     });
