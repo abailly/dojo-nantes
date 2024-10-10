@@ -55,7 +55,8 @@ class Uxn {
         // TODO: set pc at 0x100
         while (this.program_counter < program.length) {
 	    let opcode = program.charCodeAt(this.program_counter) 
-	    let op = { opcode };
+	    let rmode = (program.charCodeAt(this.program_counter) & 0b01000000) > 0;
+	    let op = { opcode, rmode };
             switch(op.opcode) {
                 case 0x00:
                     return;
@@ -63,10 +64,18 @@ class Uxn {
                     this.inc();
                     break;
                 case 0x02:
-                    this.pop();
+		    if (op.rmode) {
+                       this.popr();
+	            } else {
+                       this.pop();
+		    };
                     break;
                 case 0x42:
-                    this.popr();
+		    if (op.rmode) {
+                       this.popr();
+	            } else {
+                       this.pop();
+		    };
                     break;
                 case 0x03:
 		               this.nip();
