@@ -27,6 +27,10 @@ class Uxn {
         this.stack.pop();
     }
 
+    popr() {
+        this.return_stack.pop();
+    }
+
     add() {
         this.stack.push(this.stack.pop() + this.stack.pop());
     }
@@ -60,6 +64,9 @@ class Uxn {
                     break;
                 case 0x02:
                     this.pop();
+                    break;
+                case 0x42:
+                    this.popr();
                     break;
                 case 0x03:
 		               this.nip();
@@ -248,6 +255,12 @@ describe('Uxn VM', () => {
 	          const uxn = new Uxn();
 	          uxn.emulate('\xc0\x03');
 	          expect(uxn.return_stack).toStrictEqual([0x03]);
+        });
+
+        test('handle r mode for POP', () => {
+	          const uxn = new Uxn();
+	          uxn.emulate('\xc0\x03\x42');
+	          expect(uxn.return_stack).toStrictEqual([]);
         });
 
     });
