@@ -1,7 +1,13 @@
 import { describe, expect, test } from '@jest/globals';
 
 type Program = string
+type Op = { opcode: number, rmode: boolean }
 
+function parse(bits: number) : Op {
+	    let opcode = bits;
+	    let rmode = (bits & 0b01000000) > 0;
+	    return { opcode, rmode };
+}
 class Uxn {
     stack: any[]
     return_stack: any[]
@@ -23,12 +29,8 @@ class Uxn {
         stack.push(param);
     }
 
-    pop() {
-        this.stack.pop();
-    }
-
-    popr() {
-        this.return_stack.pop();
+    pop(stack : number[]) {
+       stack.pop();
     }
 
     add() {
@@ -54,9 +56,7 @@ class Uxn {
         // TODO: load program at address 0x0100
         // TODO: set pc at 0x100
         while (this.program_counter < program.length) {
-	    let opcode = program.charCodeAt(this.program_counter) 
-	    let rmode = (program.charCodeAt(this.program_counter) & 0b01000000) > 0;
-	    let op = { opcode, rmode };
+	    let op = parse(program.charCodeAt(this.program_counter));
             switch(op.opcode) {
                 case 0x00:
                     return;
@@ -65,16 +65,16 @@ class Uxn {
                     break;
                 case 0x02:
 		    if (op.rmode) {
-                       this.popr();
+                       this.pop(this.return_stack);
 	            } else {
-                       this.pop();
+                       this.pop(this.stack);
 		    };
                     break;
                 case 0x42:
 		    if (op.rmode) {
-                       this.popr();
+                       this.pop(this.return_stack);
 	            } else {
-                       this.pop();
+                       this.pop(this.stack);
 		    };
                     break;
                 case 0x03:
