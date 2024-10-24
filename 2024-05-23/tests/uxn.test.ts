@@ -42,11 +42,11 @@ class Uxn {
     }
 
     nip (op: Op) {
-	    if (op.shortMode) {
-	      this.stack.splice(this.stack.length -4, 2);
-	    } else {
-	      this.stack.splice(this.stack.length -2, 1);
-	    }
+	    const [ index, numberOfBytes ] = (op.shortMode)
+		? [ this.stack.length - (2*2), (1*2) ]
+		: [ this.stack.length - 2, 1 ];
+
+	    this.stack.splice(index, numberOfBytes);
     }
 
     swap () {
