@@ -41,8 +41,12 @@ class Uxn {
         this.stack.push(this.stack.pop() + this.stack.pop());
     }
 
-    nip () {
+    nip (op: Op) {
+	    if (op.shortMode) {
+	      this.stack.splice(this.stack.length -4, 2);
+	    } else {
 	      this.stack.splice(this.stack.length -2, 1);
+	    }
     }
 
     swap () {
@@ -58,6 +62,7 @@ class Uxn {
 
     jmp(op: Op) {
        let stack = op.rmode ? this.return_stack : this.stack;
+
        if (op.shortMode) {
          const retl = stack.pop();
          const reth = stack.pop() << 0x08;
@@ -88,7 +93,7 @@ class Uxn {
 		    };
                     break;
                 case 0x03:
-		               this.nip();
+		               this.nip(op);
 		               break;
                 case 0x04:
 		                this.swap();
@@ -274,6 +279,13 @@ describe('Uxn VM', () => {
 	          uxn.emulate('\xc0\x03\x42');
 	          expect(uxn.return_stack).toStrictEqual([]);
         });
+
+	test('handle short mode for NIP', () => {
+	   const uxn = new Uxn();
+	   uxn.emulate('\x80\x12\x80\x34\x80\x56\x80\x78\x23');
+	   expect(uxn.stack).toStrictEqual([0x56,0x78]);
+        });
+
 
     });
 });
