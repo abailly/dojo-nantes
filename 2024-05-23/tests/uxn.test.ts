@@ -1,17 +1,16 @@
 import { describe, expect, test } from '@jest/globals';
 
 type Program = string
-type Op = { opcode: number, rmode: boolean }
+type Op = { opcode: number, rmode: boolean, shortMode: boolean }
 
 function parse(bits: number) : Op {
-	    if (bits === 0x6c) { return { opcode: bits, rmode: false, }; }
+	    let rmode     = (bits & 0b01000000) > 0;
+	    let shortMode = (bits & 0b00100000) > 0;
 
-	    let opcode = (bits === 0x80 || bits === 0xc0) ? bits : (bits & 0b00011111);
-	    let rmode = (bits & 0b01000000) > 0;
+	    let mask = ((rmode)? 0b10111111 : 0xff) & ((shortMode)? 0b11011111 : 0xff);
+	    let opcode = bits & mask;
 
-	    let mask = ((rmode)? 0b10111111 : 0xff);
-
-	    return { opcode: opcode & mask, rmode };
+	    return { opcode, rmode, shortMode };
 }
 class Uxn {
     stack: any[]
@@ -85,9 +84,17 @@ class Uxn {
 		                this.rot();
 		                break;
                 case 0x0c:
-                    const offset = this.stack.pop();
-                    this.program_counter += offset;
-                    break;
+		    if (op.shortMode && op.rmode) {
+		      const retl = this.return_stack.pop();
+		      const reth = (this.return_stack.pop() << 0x08);
+		      const ret = retl + reth;
+		      this.program_counter = ret;
+		      continue;
+		    } else {
+                        const offset = this.stack.pop();
+                        this.program_counter += offset;
+                        break;
+		    }
                 case 0x0e: {
                     const offset = this.stack.pop();
 		    const ret = this.program_counter + 1;
@@ -115,12 +122,6 @@ class Uxn {
                 case 0x18:
 		                this.add();
 		                break;
-		case 0x6c:
-		    const retl = this.return_stack.pop();
-		    const reth = (this.return_stack.pop() << 0x08);
-		    const ret = retl + reth;
-		    this.program_counter = ret;
-		    continue;
                 case 0x80:
                     this.program_counter += 1;
 	            if (op.rmode) {
