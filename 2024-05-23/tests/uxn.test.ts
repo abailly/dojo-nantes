@@ -4,9 +4,14 @@ type Program = string
 type Op = { opcode: number, rmode: boolean }
 
 function parse(bits: number) : Op {
-	    let opcode = bits;
+	    if (bits === 0x6c) { return { opcode: bits, rmode: false, }; }
+
+	    let opcode = (bits === 0x80 || bits === 0xc0) ? bits : (bits & 0b00011111);
 	    let rmode = (bits & 0b01000000) > 0;
-	    return { opcode, rmode };
+
+	    let mask = ((rmode)? 0b10111111 : 0xff);
+
+	    return { opcode: opcode & mask, rmode };
 }
 class Uxn {
     stack: any[]
@@ -70,13 +75,6 @@ class Uxn {
                        this.pop(this.stack);
 		    };
                     break;
-                case 0x42:
-		    if (op.rmode) {
-                       this.pop(this.return_stack);
-	            } else {
-                       this.pop(this.stack);
-		    };
-                    break;
                 case 0x03:
 		               this.nip();
 		               break;
@@ -125,11 +123,11 @@ class Uxn {
 		    continue;
                 case 0x80:
                     this.program_counter += 1;
-                    this.lit(program.charCodeAt(this.program_counter), this.stack);
-                    break;
-                case 0xc0:
-                    this.program_counter += 1;
-                    this.lit(program.charCodeAt(this.program_counter), this.return_stack);
+	            if (op.rmode) {
+                        this.lit(program.charCodeAt(this.program_counter), this.return_stack);
+		    } else {
+                        this.lit(program.charCodeAt(this.program_counter), this.stack);
+		    }
                     break;
             }
             this.program_counter += 1;
