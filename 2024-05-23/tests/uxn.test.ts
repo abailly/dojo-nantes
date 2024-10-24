@@ -56,6 +56,19 @@ class Uxn {
 	      this.stack.push(b, c, a);
     }
 
+    jmp(op: Op) {
+       let stack = op.rmode ? this.return_stack : this.stack;
+       if (op.shortMode) {
+         const retl = stack.pop();
+         const reth = stack.pop() << 0x08;
+         const ret = retl + reth;
+         this.program_counter = ret;
+       } else {
+         const offset = stack.pop();
+         this.program_counter += offset + 1;
+       }
+    }
+     
     emulate (program : Program)  {
         // TODO: load program at address 0x0100
         // TODO: set pc at 0x100
@@ -84,17 +97,8 @@ class Uxn {
 		                this.rot();
 		                break;
                 case 0x0c:
-		    if (op.shortMode && op.rmode) {
-		      const retl = this.return_stack.pop();
-		      const reth = (this.return_stack.pop() << 0x08);
-		      const ret = retl + reth;
-		      this.program_counter = ret;
-		      continue;
-		    } else {
-                        const offset = this.stack.pop();
-                        this.program_counter += offset;
-                        break;
-		    }
+		    this.jmp(op);
+		    continue;
                 case 0x0e: {
                     const offset = this.stack.pop();
 		    const ret = this.program_counter + 1;
