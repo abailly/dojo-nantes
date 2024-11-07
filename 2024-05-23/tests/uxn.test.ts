@@ -3,112 +3,124 @@ import { describe, expect, test } from '@jest/globals';
 type Program = string
 type Op = { opcode: number, rmode: boolean, shortMode: boolean }
 
-function parse(bits: number) : Op {
-	    let rmode     = (bits & 0b01000000) > 0;
-	    let shortMode = (bits & 0b00100000) > 0;
+function parse(bits: number): Op {
+    let rmode = (bits & 0b01000000) > 0;
+    let shortMode = (bits & 0b00100000) > 0;
 
-	    let mask = ((rmode)? 0b10111111 : 0xff) & ((shortMode)? 0b11011111 : 0xff);
-	    let opcode = bits & mask;
+    let mask = ((rmode) ? 0b10111111 : 0xff) & ((shortMode) ? 0b11011111 : 0xff);
+    let opcode = bits & mask;
 
-	    return { opcode, rmode, shortMode };
+    return { opcode, rmode, shortMode };
 }
+
 class Uxn {
     stack: any[]
     return_stack: any[]
     devices: Devices
     program_counter: number
 
-    constructor (devices: Devices = new Devices()) {
+    constructor(devices: Devices = new Devices()) {
         this.stack = []
         this.return_stack = []
-	      this.devices = devices;
+        this.devices = devices;
         this.program_counter = 0;
     }
 
     inc() {
-	      this.stack[this.stack.length-1]++;
+        this.stack[this.stack.length - 1]++;
     }
 
-    lit(param: number, stack: number[]) {
-        stack.push(param);
-    }
-
-    pop(stack : number[]) {
-       stack.pop();
+    pop(stack: number[]) {
+        stack.pop();
     }
 
     add() {
         this.stack.push(this.stack.pop() + this.stack.pop());
     }
 
-    nip (op: Op) {
-	    const [ index, numberOfBytes ] = (op.shortMode)
-		? [ this.stack.length - (2*2), (1*2) ]
-		: [ this.stack.length - 2, 1 ];
+    nip(op: Op) {
+        const [index, numberOfBytes] = op.shortMode
+            ? [this.stack.length - (2 * 2), (1 * 2)]
+            : [this.stack.length - 2, 1];
 
-	    this.stack.splice(index, numberOfBytes);
+        this.stack.splice(index, numberOfBytes);
     }
 
-    swap () {
-	      this.stack.push.apply(this.stack, this.stack.splice(this.stack.length -2, 1));
+    lit(op: Op, program: Program) {
+        let stack = op.rmode ? this.return_stack : this.stack;
+        
+        let pushOneByte = () => {
+            this.program_counter += 1;
+            let byte = program.charCodeAt(this.program_counter);
+            stack.push(byte);
+        }
+
+        pushOneByte();
+        if (op.shortMode) {
+            pushOneByte();
+        }
     }
 
-    rot () {
+    swap() {
+        this.stack.push.apply(this.stack, this.stack.splice(this.stack.length - 2, 1));
+    }
+
+    rot() {
         const c = this.stack.pop();
-	      const b = this.stack.pop();
-	      const a = this.stack.pop();
-	      this.stack.push(b, c, a);
+        const b = this.stack.pop();
+        const a = this.stack.pop();
+        this.stack.push(b, c, a);
     }
 
     jmp(op: Op) {
-       let stack = op.rmode ? this.return_stack : this.stack;
+        let stack = op.rmode ? this.return_stack : this.stack;
 
-       if (op.shortMode) {
-         const retl = stack.pop();
-         const reth = stack.pop() << 0x08;
-         const ret = retl + reth;
-         this.program_counter = ret;
-       } else {
-         const offset = stack.pop();
-         this.program_counter += offset + 1;
-       }
+        if (op.shortMode) {
+            const retl = stack.pop();
+            const reth = stack.pop() << 0x08;
+            const ret = retl + reth;
+            this.program_counter = ret;
+        } else {
+            const offset = stack.pop();
+            this.program_counter += offset + 1;
+        }
     }
-     
-    emulate (program : Program)  {
+
+    emulate(program: Program) {
         // TODO: load program at address 0x0100
         // TODO: set pc at 0x100
         while (this.program_counter < program.length) {
-	    let op = parse(program.charCodeAt(this.program_counter));
-            switch(op.opcode) {
+            let op = parse(program.charCodeAt(this.program_counter));
+            switch (op.opcode) {
                 case 0x00:
                     return;
                 case 0x01:
                     this.inc();
                     break;
                 case 0x02:
-		    if (op.rmode) {
-                       this.pop(this.return_stack);
-	            } else {
-                       this.pop(this.stack);
-		    };
+                    if (op.rmode) {
+                        this.pop(this.return_stack);
+                    } else {
+                        this.pop(this.stack);
+                    };
                     break;
                 case 0x03:
-		               this.nip(op);
-		               break;
+                    this.nip(op);
+                    break;
                 case 0x04:
-		                this.swap();
-		                break;
-		            case 0x05:
-		                this.rot();
-		                break;
+                    this.swap();
+                    break;
+                case 0x05:
+                    this.rot();
+                    break;
                 case 0x0c:
-		    this.jmp(op);
-		    continue;
+                    this.jmp(op);
+                    continue;
                 case 0x0e: {
                     const offset = this.stack.pop();
-		    const ret = this.program_counter + 1;
-		    const reth = (ret >> 0x08) & 0xff;
-		    const retl = ret & 0xff;
+                    const ret = this.program_counter + 1;
+                    const reth = (ret >> 0x08) & 0xff;
+                    const retl = ret & 0xff;
                     this.return_stack.push(reth);
                     this.return_stack.push(retl);
                     this.program_counter += offset;
@@ -120,24 +132,21 @@ class Uxn {
                     break;
                 case 0x17:
                     const device = this.stack.pop();
-		                const val = this.stack.pop();
-		                const deviceIndex = 0xf0 & device;
-		                const port = 0x0f & device;
-		                const selectedDevice  = this.devices.getDevice(deviceIndex);
-		                if (selectedDevice) {
-		    	              selectedDevice.output(port, val);
-		                }
+                    const val = this.stack.pop();
+                    const deviceIndex = 0xf0 & device;
+                    const port = 0x0f & device;
+                    const selectedDevice = this.devices.getDevice(deviceIndex);
+                    if (selectedDevice) {
+                        selectedDevice.output(port, val);
+                    }
                     break;
                 case 0x18:
-		                this.add();
-		                break;
+                    this.add();
+                    break;
                 case 0x80:
-                    this.program_counter += 1;
-	            if (op.rmode) {
-                        this.lit(program.charCodeAt(this.program_counter), this.return_stack);
-		    } else {
-                        this.lit(program.charCodeAt(this.program_counter), this.stack);
-		    }
+                    this.lit(op, program);
+                    break;
+                default:
                     break;
             }
             this.program_counter += 1;
@@ -147,44 +156,44 @@ class Uxn {
 
 class Device {
 
-	  out : number[][] = Array(16).fill([])
+    out: number[][] = Array(16).fill([])
 
-    get (port : number) : number[] {
+    get(port: number): number[] {
         return this.out[port];
     }
 
-	  output (port : number, value : number) {
-		    this.out[port].unshift(value);
-	  }
+    output(port: number, value: number) {
+        this.out[port].unshift(value);
+    }
 
 }
 
 enum DeviceType {
-	  CONSOLE = 16,
+    CONSOLE = 16,
     SCREEN = 32
 }
 
 class Devices {
 
-    devices : (Device | null)[]
+    devices: (Device | null)[]
 
-    constructor () {
+    constructor() {
         this.devices = Array(16).fill(null);
     }
 
-    private deviceIndex(deviceType : DeviceType) : number {
+    private deviceIndex(deviceType: DeviceType): number {
         return deviceType >> 4;
     }
 
     getDevice(deviceType: DeviceType) {
-	      return this.devices[this.deviceIndex(deviceType)];
+        return this.devices[this.deviceIndex(deviceType)];
     }
 
-    set console (device : Device) {
-	      this.devices[this.deviceIndex(DeviceType.CONSOLE)] = device;
+    set console(device: Device) {
+        this.devices[this.deviceIndex(DeviceType.CONSOLE)] = device;
     }
-    set screen (device : Device) {
-	      this.devices[this.deviceIndex(DeviceType.SCREEN)] = device;
+    set screen(device: Device) {
+        this.devices[this.deviceIndex(DeviceType.SCREEN)] = device;
     }
 }
 
@@ -194,7 +203,7 @@ describe('Uxn VM', () => {
             const consoleAdapter = new Device();
             const devices = new Devices();
             const uxn = new Uxn(devices);
-	          devices.console = consoleAdapter;
+            devices.console = consoleAdapter;
 
             const device = DeviceType.CONSOLE;
             const port = 8;
@@ -209,7 +218,7 @@ describe('Uxn VM', () => {
             const screenAdapter = new Device();
             const devices = new Devices();
             const uxn = new Uxn(devices);
-	          devices.screen = screenAdapter;
+            devices.screen = screenAdapter;
 
             const device = DeviceType.SCREEN;
             const port = 7;
@@ -234,56 +243,62 @@ describe('Uxn VM', () => {
                 uxn.emulate(bytecode);
                 expect(uxn.stack).toStrictEqual(stack);
             });
-	      });
+        });
 
         test('emulate a JMP', () => {
-	          const uxn = new Uxn();
-	          uxn.emulate('\x80\x02\x0c\x80\x01\x80\x03');
-	          expect(uxn.stack).toStrictEqual([0x03]);
-	          expect(uxn.program_counter).toStrictEqual(0x07);
-	      });
+            const uxn = new Uxn();
+            uxn.emulate('\x80\x02\x0c\x80\x01\x80\x03');
+            expect(uxn.stack).toStrictEqual([0x03]);
+            expect(uxn.program_counter).toStrictEqual(0x07);
+        });
 
         test('emulate a STH', () => {
-	          const uxn = new Uxn();
-	          uxn.emulate('\x80\x02\x0f');
-	          expect(uxn.stack).toStrictEqual([]);
-	          expect(uxn.return_stack).toStrictEqual([0x02]);
-	      });
+            const uxn = new Uxn();
+            uxn.emulate('\x80\x02\x0f');
+            expect(uxn.stack).toStrictEqual([]);
+            expect(uxn.return_stack).toStrictEqual([0x02]);
+        });
 
         test('emulate a JSR', () => {
-	          const uxn = new Uxn();
-	          uxn.emulate('\x80\x00'.repeat(255) + '\x80\x01\x0e\x00\x80\x01');
-		  // 0x0000 : 0x80 0x00
-		  // ... (255 fois)
-		  // 0x01fe : 0x80 0x01 
-		  // 0x0200 : 0x0e     
-		  // 0x0201 : 0x00 <- l'addresse de cette instruction sur le return stack
-		  // 0x0202: 0x80 0x01
-	          expect(uxn.return_stack).toStrictEqual([0x02, 0x01]);
+            const uxn = new Uxn();
+            uxn.emulate('\x80\x00'.repeat(255) + '\x80\x01\x0e\x00\x80\x01');
+            // 0x0000 : 0x80 0x00
+            // ... (255 fois)
+            // 0x01fe : 0x80 0x01 
+            // 0x0200 : 0x0e     
+            // 0x0201 : 0x00 <- l'addresse de cette instruction sur le return stack
+            // 0x0202: 0x80 0x01
+            expect(uxn.return_stack).toStrictEqual([0x02, 0x01]);
         });
 
         test('emulate a subroutine', () => {
-	          const uxn = new Uxn();
-	          uxn.emulate('\x80\x03\x0e\x80\x03\x00\x80\x04\x6c\x80\x05');
-	          expect(uxn.stack).toStrictEqual([0x04, 0x03]);
+            const uxn = new Uxn();
+            uxn.emulate('\x80\x03\x0e\x80\x03\x00\x80\x04\x6c\x80\x05');
+            expect(uxn.stack).toStrictEqual([0x04, 0x03]);
         });
 
         test('handle r mode for LIT', () => {
-	          const uxn = new Uxn();
-	          uxn.emulate('\xc0\x03');
-	          expect(uxn.return_stack).toStrictEqual([0x03]);
+            const uxn = new Uxn();
+            uxn.emulate('\xc0\x03');
+            expect(uxn.return_stack).toStrictEqual([0x03]);
+        });
+
+        test('handle short mode for LIT (LIT2)', () => {
+            const uxn = new Uxn();
+            uxn.emulate('\xa0\x03\x04');
+            expect(uxn.stack).toStrictEqual([0x03, 0x04]);
         });
 
         test('handle r mode for POP', () => {
-	          const uxn = new Uxn();
-	          uxn.emulate('\xc0\x03\x42');
-	          expect(uxn.return_stack).toStrictEqual([]);
+            const uxn = new Uxn();
+            uxn.emulate('\xc0\x03\x42');
+            expect(uxn.return_stack).toStrictEqual([]);
         });
 
-	test('handle short mode for NIP', () => {
-	   const uxn = new Uxn();
-	   uxn.emulate('\x80\x12\x80\x34\x80\x56\x80\x78\x23');
-	   expect(uxn.stack).toStrictEqual([0x56,0x78]);
+        test('handle short mode for NIP (NIP2)', () => {
+            const uxn = new Uxn();
+            uxn.emulate('\x80\x12\x80\x34\x80\x56\x80\x78\x23');
+            expect(uxn.stack).toStrictEqual([0x56, 0x78]);
         });
 
 
