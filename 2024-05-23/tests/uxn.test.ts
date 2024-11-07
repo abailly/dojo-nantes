@@ -10,7 +10,7 @@ function parse(bits: number): Op {
 
     let mask = ((rmode) ? 0b10111111 : 0xff) & ((shortMode) ? 0b11011111 : 0xff);
     let opcode = bits;
-    if (opcode == 0x80 || opcode == 0xa0 || opcode == 0xc0  || opcode == 0xe0 ) {
+    if (opcode == 0x80 || opcode == 0xa0 || opcode == 0xc0 || opcode == 0xe0) {
         opcode = opcode & mask
     } else {
         opcode = opcode & mask & ((keepMode) ? 0b01111111 : 0xff)
@@ -33,8 +33,13 @@ class Uxn {
     }
 
     inc(op: Op) {
-        if(op.keepMode) {
-          this.stack.push(this.stack[this.stack.length - 1]);
+        if (op.keepMode) {
+            if (op.shortMode) {
+                this.stack.push(this.stack[this.stack.length - 2]);
+                this.stack.push(this.stack[this.stack.length - 2]);
+            } else {
+                this.stack.push(this.stack[this.stack.length - 1]);
+            }
         }
         this.stack[this.stack.length - 1]++;
     }
@@ -242,8 +247,10 @@ describe('Uxn VM', () => {
             ["emulate a LIT of a value then a POP", "\x80\x43\x02", []],
             ["emulate a BRK command", "\x80\x43\x01\x00\x01", [0x44]],
             ["emulate a INC command", "\x80\x43\x01", [0x44]],
+            // TODO: we don't really test INC2 here -> use overflow?
             ["emulate a INC2 command", "\xa0\x43\x43\x21", [0x43, 0x44]],
             ["emulate a INCk command", "\x80\x43\x81", [0x43, 0x44]],
+            ["emulate a INC2k command", "\xa0\x43\x43\xa1", [0x43, 0x43, 0x43, 0x44]],
             ["emulate a NIP command", "\x80\x43\x80\x42\x03", [0x42]],
             ["emulate a ADD of 2 values", "\x80\x43\x80\x42\x18", [0x85]],
             ["emulate a SWP of 2 values", "\x80\x43\x80\x42\x04", [0x42, 0x43]],
