@@ -1,16 +1,22 @@
 import { describe, expect, test } from '@jest/globals';
 
 type Program = string
-type Op = { opcode: number, rmode: boolean, shortMode: boolean }
+type Op = { opcode: number, rmode: boolean, shortMode: boolean, keepMode: boolean }
 
 function parse(bits: number): Op {
     let rmode = (bits & 0b01000000) > 0;
     let shortMode = (bits & 0b00100000) > 0;
+    let keepMode = (bits & 0b10000000) > 0;
 
     let mask = ((rmode) ? 0b10111111 : 0xff) & ((shortMode) ? 0b11011111 : 0xff);
-    let opcode = bits & mask;
+    let opcode = bits;
+    if (opcode == 0x80 || opcode == 0xa0 || opcode == 0xc0  || opcode == 0xe0 ) {
+        opcode = opcode & mask
+    } else {
+        opcode = opcode & mask & ((keepMode) ? 0b01111111 : 0xff)
+    }
 
-    return { opcode, rmode, shortMode };
+    return { opcode, rmode, shortMode, keepMode };
 }
 
 class Uxn {
@@ -26,7 +32,10 @@ class Uxn {
         this.program_counter = 0;
     }
 
-    inc() {
+    inc(op: Op) {
+        if(op.keepMode) {
+          this.stack.push(this.stack[this.stack.length - 1]);
+        }
         this.stack[this.stack.length - 1]++;
     }
 
@@ -48,7 +57,7 @@ class Uxn {
 
     lit(op: Op, program: Program) {
         let stack = op.rmode ? this.return_stack : this.stack;
-        
+
         let pushOneByte = () => {
             this.program_counter += 1;
             let byte = program.charCodeAt(this.program_counter);
@@ -95,7 +104,7 @@ class Uxn {
                 case 0x00:
                     return;
                 case 0x01:
-                    this.inc();
+                    this.inc(op);
                     break;
                 case 0x02:
                     if (op.rmode) {
@@ -233,6 +242,8 @@ describe('Uxn VM', () => {
             ["emulate a LIT of a value then a POP", "\x80\x43\x02", []],
             ["emulate a BRK command", "\x80\x43\x01\x00\x01", [0x44]],
             ["emulate a INC command", "\x80\x43\x01", [0x44]],
+            ["emulate a INC2 command", "\xa0\x43\x43\x21", [0x43, 0x44]],
+            ["emulate a INCk command", "\x80\x43\x81", [0x43, 0x44]],
             ["emulate a NIP command", "\x80\x43\x80\x42\x03", [0x42]],
             ["emulate a ADD of 2 values", "\x80\x43\x80\x42\x18", [0x85]],
             ["emulate a SWP of 2 values", "\x80\x43\x80\x42\x04", [0x42, 0x43]],
@@ -287,6 +298,12 @@ describe('Uxn VM', () => {
             const uxn = new Uxn();
             uxn.emulate('\xa0\x03\x04');
             expect(uxn.stack).toStrictEqual([0x03, 0x04]);
+        });
+
+        test('handle short+return mode for LIT (LIT2r)', () => {
+            const uxn = new Uxn();
+            uxn.emulate('\xe0\x03\x04');
+            expect(uxn.return_stack).toStrictEqual([0x03, 0x04]);
         });
 
         test('handle r mode for POP', () => {
