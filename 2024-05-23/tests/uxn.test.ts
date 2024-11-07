@@ -33,15 +33,17 @@ class Uxn {
     }
 
     inc(op: Op) {
+        let stack = op.rmode? this.return_stack : this.stack;
+
         if (op.keepMode) {
             if (op.shortMode) {
-                this.stack.push(this.stack[this.stack.length - 2]);
-                this.stack.push(this.stack[this.stack.length - 2]);
+                stack.push(stack[stack.length - 2]);
+                stack.push(stack[stack.length - 2]);
             } else {
-                this.stack.push(this.stack[this.stack.length - 1]);
+                stack.push(stack[stack.length - 1]);
             }
         }
-        this.stack[this.stack.length - 1]++;
+        stack[stack.length - 1]++;
     }
 
     pop(stack: number[]) {
@@ -299,6 +301,12 @@ describe('Uxn VM', () => {
             const uxn = new Uxn();
             uxn.emulate('\xc0\x03');
             expect(uxn.return_stack).toStrictEqual([0x03]);
+        });
+
+        test('handle r mode for INC', () => {
+            const uxn = new Uxn();
+            uxn.emulate('\xc0\x03\x41');
+            expect(uxn.return_stack).toStrictEqual([0x04]);
         });
 
         test('handle short mode for LIT (LIT2)', () => {
