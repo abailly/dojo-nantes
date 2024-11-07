@@ -33,7 +33,7 @@ class Uxn {
     }
 
     inc(op: Op) {
-        let stack = op.rmode? this.return_stack : this.stack;
+        let stack = op.rmode ? this.return_stack : this.stack;
 
         if (op.keepMode) {
             if (op.shortMode) {
@@ -307,6 +307,12 @@ describe('Uxn VM', () => {
             const uxn = new Uxn();
             uxn.emulate('\xc0\x03\x41');
             expect(uxn.return_stack).toStrictEqual([0x04]);
+        });
+
+        test('handle r + 2 + k mode for INC', () => {
+            const uxn = new Uxn();
+            uxn.emulate('\xe0\x03\x02\xe1');
+            expect(uxn.return_stack).toStrictEqual([0x03, 0x02, 0x03, 0x03]);
         });
 
         test('handle short mode for LIT (LIT2)', () => {
