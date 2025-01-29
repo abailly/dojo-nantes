@@ -4,13 +4,13 @@ Ceci est le repository du *Coding Dojo de Nantes*.
 
 ## Distanciel
 
-* Quand? [2024-10-24](2024-05-23)
+* Quand? [2025-1-30](2025-01-30)
 * Où? Sur le [discord Okiwi](https://discord.gg/Hhrm4Avu)
 
 ## Présentiel
 
-* Quand [2024-10-24](2024-10-24)
-* Où Dans les locaux de [Palo-IT Nantes](https://maps.app.goo.gl/e5bhRA3fTNcGzdsa8), 1, rue Saint-Julien, Nantes.
+* Quand [?]()
+* Où ?
 
 # Comment ça marche?
 
@@ -26,6 +26,10 @@ Ceci est le repository du *Coding Dojo de Nantes*.
 Un dojo de code – coding dojo – est un lieu où pratiquer et apprendre à coder collectivement, pour tous ceux que le code passionne ou a minima intéresse. Un lieu où expérimenter, découvrir, ralentir, respirer, discuter, oser, montrer, argumenter, bref vivre ensemble une petite aventure de codage. Dans le temps d’une à deux heures, avec des règles garantissant que chacun se sente en sécurité, venez partager votre intérêt pour le code, tout le code.
 
 # Sessions
+
+## 2025
+
+* Session du [30 janvier 2025](2025-01-30)
 
 ## 2024
 
