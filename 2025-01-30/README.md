@@ -9,6 +9,8 @@
 
 ## Next ?
 
+* [2025-02-10](../2025-02-10)
+
 ## Comment ?
 
 * j'aimerais faire du UXN, on pourrait faire un fibonacci ? ou un score de bowling?
