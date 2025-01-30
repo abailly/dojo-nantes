@@ -4,7 +4,7 @@ Ceci est le repository du *Coding Dojo de Nantes*.
 
 ## Distanciel
 
-* Quand? [2025-1-30](2025-01-30)
+* Quand? [2025-1-30](2025-01-30/README.md)
 * Où? Sur le [discord Okiwi](https://discord.gg/Hhrm4Avu)
 
 ## Présentiel
