@@ -1,20 +1,23 @@
-# Development Environment
+# Environment de développement
 
-[Terraform](https://www.hashicorp.com/products/terraform) based code to setup a development environment for hacking Haskell code. The VM will be configured with:
+Ce répertoire contient du code [opentofu](https://opentofu.org) pour créer une VM contenant un environnement de développement pour divers langages:
 
-* Vanilla [Emacs](https://emacs.org) for editing code, with [lsp-mode](https://emacs-lsp.github.io/) using [lsp-haskell](https://emacs-lsp.github.io/lsp-haskell/) and [haskell-language-server](https://github.com/haskell/haskell-language-server),
-* [nix](https://nixos.org/) for dependencies management and building Haskell code, with nix-shell providing the proper environment for emacs' LSP,
-* [direnv](https://direnv.net/) to provide a per-directory environment that will trigger entering nix.
+* [Emacs](https://emacs.org) de base et [neovim](https://neovim.io) pour l'édition de code,
+* Fichiers de configuration tirés de [https://github.com/abailly/dotfiles](https://github.com/abailly/dotfiles)
+* [GHCup](https://www.haskell.org/ghcup/) pour du Haskell
+* [SBCL](https://www.sbcl.org) avec [Quicklisp](https://www.quicklisp.org/beta/) pour du Common Lisp
+* [rustup](https://rustup.rs) pour du Rust
+* [nvm](https://github.com/nvm-sh/nvm) pour Javascript/Typescript
 
-## Logging in
+## Connexion
 
-If you want to be able to log into the remote VM during the coding dojo, add your public key in a PR to the [ssh_keys](./ssh_keys) file, as the line:
+Pour pouvoir se connecter durant le dojo, ajoutez votre clé publique ssh au fichier [ssh_keys](./ssh_keys) en faisant une _pull request_, sous la forme:
 
 ```
 curry:<key-type> <key encoded in base64>
 ```
 
-Then during the session, participants can log into the VM using (where `x.y.z.t` is the actual VM IP which will be communicated before the dojo starts):
+Durant la session, les participants peuvent tou·te·s se connecter sur le même terminal dans la VM avec les commandes suivantes (où `x.y.z.t` est l'adresse IP de la VM qui est communiquée avavant le dojo):
 
 ```
 ssh curry@x.y.z.t
