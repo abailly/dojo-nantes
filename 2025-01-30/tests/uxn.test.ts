@@ -204,7 +204,7 @@ class Uxn {
 		    this.jsi(program);
 		    break;
                 default:
-                    break;
+                    throw new Error(":/");
             }
             this.program_counter += 1;
         }
@@ -410,5 +410,16 @@ describe('Uxn VM', () => {
             expect(uxn.stack).toStrictEqual([0x03, 0x02]);
         });
 
+	// test all operations (but BRK) are implemented
+	// by implemented we mean "does something"
+        [...Array(20).keys()].filter((x) => x > 0).forEach((byte) => {
+	   test (`handle 0x${byte.toString(16)} instruction`, () => {
+		   const uxn = new Uxn();
+		   const program = String.fromCharCode(byte);
+		   uxn.emulate(program);
+		   expect(uxn.program_counter).not.toStrictEqual(0);
+	   });
+	});
+         
     });
 });
