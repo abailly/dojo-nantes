@@ -108,12 +108,15 @@ class Uxn {
         }
     }
 
-    jci(p: Program) {
+    jci(program: Program) {
         const cond = this.stack.pop();
 	if (cond === 0x00) {
 	    this.program_counter += 2;
 	} else {
-	    this.program_counter += 4;
+            let hb = program.charCodeAt(this.program_counter + 1) << 0x08;
+            let lb = program.charCodeAt(this.program_counter + 2);
+	    let offset = hb + lb;	
+	    this.program_counter += offset;
 	}
     }
 
@@ -360,6 +363,12 @@ describe('Uxn VM', () => {
        	test('handle JCI when condition is not zero', () => {
             const uxn = new Uxn();
             uxn.emulate('\x80\x01\x20\x00\x04\x80\x02\x80\x03');
+            expect(uxn.stack).toStrictEqual([0x03]);
+        });
+     
+       	test('handle JCI at larger offset when condition is not zero', () => {
+            const uxn = new Uxn();
+            uxn.emulate('\x80\x01\x20\x00\x06\x80\x02\x00\x00\x80\x03');
             expect(uxn.stack).toStrictEqual([0x03]);
         });
      
