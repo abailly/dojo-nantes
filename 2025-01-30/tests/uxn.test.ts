@@ -110,7 +110,11 @@ class Uxn {
 
     jci(p: Program) {
         const cond = this.stack.pop();
-	this.program_counter += 4;
+	if (cond === 0x00) {
+	    this.program_counter += 2;
+	} else {
+	    this.program_counter += 4;
+	}
     }
 
     emulate(program: Program) {
@@ -358,5 +362,13 @@ describe('Uxn VM', () => {
             uxn.emulate('\x80\x01\x20\x00\x04\x80\x02\x80\x03');
             expect(uxn.stack).toStrictEqual([0x03]);
         });
+     
+     	test('handle JCI when condition is zero', () => {
+            const uxn = new Uxn();
+            uxn.emulate('\x80\x00\x20\x00\x04\x80\x02\x80\x03');
+            expect(uxn.stack).toStrictEqual([0x02, 0x03]);
+        });
+
+
     });
 });
