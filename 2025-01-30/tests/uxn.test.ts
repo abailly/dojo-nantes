@@ -4,9 +4,9 @@ type Program = string
 type Op = { opcode: number, rmode: boolean, shortMode: boolean, keepMode: boolean }
 
 function parse(bits: number): Op {
-    // Special case handling `JCI` instruction, that doesn't have any mode
-    if (bits === 0x20) {
-        return { opcode: 0x20, rmode: false, shortMode: false, keepMode: false };
+    // Special case handling `JCI/JMI/JSI` instruction, which do not have any mode
+    if (bits === 0x20 || bits === 0x40 || bits == 0x60) {
+        return { opcode: bits, rmode: false, shortMode: false, keepMode: false };
     }
 
     let rmode = (bits & 0b01000000) > 0;
@@ -113,11 +113,25 @@ class Uxn {
 	if (cond === 0x00) {
 	    this.program_counter += 2;
 	} else {
-            let hb = program.charCodeAt(this.program_counter + 1) << 0x08;
-            let lb = program.charCodeAt(this.program_counter + 2);
-	    let offset = hb + lb;	
-	    this.program_counter += offset;
+            this.jmi(program);
 	}
+    }
+
+    jmi(program: Program) {
+    	let hb = program.charCodeAt(this.program_counter + 1) << 0x08;
+    	let lb = program.charCodeAt(this.program_counter + 2);
+    	let offset = hb + lb;	
+    	this.program_counter += offset;
+    }
+
+    jsi(program: Program) {
+    	let hb = program.charCodeAt(this.program_counter + 1) << 0x08;
+    	let lb = program.charCodeAt(this.program_counter + 2);
+    	let offset = hb + lb;
+        let ret = this.program_counter + 3;	
+	this.return_stack.push(ret >> 0x08 & 0xff);
+	this.return_stack.push(ret & 0xff);
+    	this.program_counter += offset;
     }
 
     emulate(program: Program) {
@@ -182,6 +196,12 @@ class Uxn {
                     break;
 		case 0x20:
 		    this.jci(program);
+		    break;
+		case 0x40:
+		    this.jmi(program);
+		    break;
+		case 0x60:
+		    this.jsi(program);
 		    break;
                 default:
                     break;
@@ -377,7 +397,18 @@ describe('Uxn VM', () => {
             uxn.emulate('\x80\x00\x20\x00\x04\x80\x02\x80\x03');
             expect(uxn.stack).toStrictEqual([0x02, 0x03]);
         });
-
+       	
+	test('handle JMI', () => {
+            const uxn = new Uxn();
+            uxn.emulate('\x40\x00\x06\x80\x02\x00\x00\x80\x03');
+            expect(uxn.stack).toStrictEqual([0x03]);
+        });
+     
+	test('handle JSI', () => {
+            const uxn = new Uxn();
+            uxn.emulate('\x60\x00\x05\x80\x02\x00\x80\x03\x6c');
+            expect(uxn.stack).toStrictEqual([0x03, 0x02]);
+        });
 
     });
 });
