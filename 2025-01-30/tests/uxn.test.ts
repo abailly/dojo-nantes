@@ -2,6 +2,7 @@ import { describe, expect, test } from '@jest/globals';
 
 type Program = string
 type Op = { opcode: number, rmode: boolean, shortMode: boolean, keepMode: boolean }
+type Stack = any[];
 
 function parse(bits: number): Op {
     // Special case handling `JCI/JMI/JSI` instruction, which do not have any mode
@@ -26,8 +27,8 @@ function parse(bits: number): Op {
 }
 
 class Uxn {
-    stack: any[]
-    return_stack: any[]
+    stack: Stack
+    return_stack: Stack
     devices: Devices
     program_counter: number
 
@@ -38,9 +39,7 @@ class Uxn {
         this.program_counter = 0;
     }
 
-    inc(op: Op) {
-        let stack = op.rmode ? this.return_stack : this.stack;
-
+    inc(op: Op, stack: Stack) {
         if (op.keepMode) {
             if (op.shortMode) {
                 stack.push(stack[stack.length - 2]);
@@ -68,9 +67,7 @@ class Uxn {
         this.stack.splice(index, numberOfBytes);
     }
 
-    lit(op: Op, program: Program) {
-        let stack = op.rmode ? this.return_stack : this.stack;
-
+    lit(op: Op, program: Program, stack: Stack) {
         let pushOneByte = () => {
             this.program_counter += 1;
             let byte = program.charCodeAt(this.program_counter);
@@ -94,9 +91,12 @@ class Uxn {
         this.stack.push(b, c, a);
     }
 
-    jmp(op: Op) {
-        let stack = op.rmode ? this.return_stack : this.stack;
+    dup(stack: any[]) {
+        const a = stack.pop();
+        stack.push(a, a);
+    }
 
+    jmp(op: Op, stack: Stack) {
         if (op.shortMode) {
             const retl = stack.pop();
             const reth = stack.pop() << 0x08;
@@ -139,18 +139,15 @@ class Uxn {
         // TODO: set pc at 0x100
         while (this.program_counter < program.length) {
             let op = parse(program.charCodeAt(this.program_counter));
+            let stack = op.rmode ? this.return_stack : this.stack;
             switch (op.opcode) {
                 case 0x00:
                     return;
                 case 0x01:
-                    this.inc(op);
+                    this.inc(op, stack);
                     break;
                 case 0x02:
-                    if (op.rmode) {
-                        this.pop(this.return_stack);
-                    } else {
-                        this.pop(this.stack);
-                    };
+		    this.pop(stack);
                     break;
                 case 0x03:
                     this.nip(op);
@@ -161,8 +158,11 @@ class Uxn {
                 case 0x05:
                     this.rot();
                     break;
+                case 0x06:
+                    this.dup(stack);
+                    break;
                 case 0x0c:
-                    this.jmp(op);
+                    this.jmp(op, stack);
                     continue;
                 case 0x0e: {
                     const offset = this.stack.pop();
@@ -192,7 +192,7 @@ class Uxn {
                     this.add();
                     break;
                 case 0x80:
-                    this.lit(op, program);
+                    this.lit(op, program, stack);
                     break;
 		case 0x20:
 		    this.jci(program);
@@ -408,6 +408,18 @@ describe('Uxn VM', () => {
             const uxn = new Uxn();
             uxn.emulate('\x60\x00\x05\x80\x02\x00\x80\x03\x6c');
             expect(uxn.stack).toStrictEqual([0x03, 0x02]);
+        });
+
+	test('handle DUP', () => {
+            const uxn = new Uxn();
+            uxn.emulate('\x80\x02\x06');
+            expect(uxn.stack).toStrictEqual([0x02, 0x02]);
+        });
+
+	test('handle DUPr', () => {
+            const uxn = new Uxn();
+            uxn.emulate('\xc0\x02\x46');
+            expect(uxn.return_stack).toStrictEqual([0x02, 0x02]);
         });
 
 	// test all operations (but BRK) are implemented
