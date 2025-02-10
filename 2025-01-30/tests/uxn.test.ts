@@ -91,9 +91,19 @@ class Uxn {
         this.stack.push(b, c, a);
     }
 
-    dup(stack: any[]) {
-        const a = stack.pop();
-        stack.push(a, a);
+    dup(op: Op, stack: any[]) {
+        const sliceSize = (op.shortMode) ? 2 : 1;
+        const bytesToDuplicate = stack.slice(0, sliceSize);
+
+	bytesToDuplicate.forEach((a) => {
+	    stack.push(a);
+	});
+
+	if (op.keepMode) {
+	    bytesToDuplicate.forEach((a) => {
+	        stack.push(a);
+	    });
+	}
     }
 
     jmp(op: Op, stack: Stack) {
@@ -159,7 +169,7 @@ class Uxn {
                     this.rot();
                     break;
                 case 0x06:
-                    this.dup(stack);
+                    this.dup(op, stack);
                     break;
                 case 0x0c:
                     this.jmp(op, stack);
@@ -420,6 +430,18 @@ describe('Uxn VM', () => {
             const uxn = new Uxn();
             uxn.emulate('\xc0\x02\x46');
             expect(uxn.return_stack).toStrictEqual([0x02, 0x02]);
+        });
+
+	test('handle DUPk', () => {
+            const uxn = new Uxn();
+            uxn.emulate('\x80\x02\x86');
+            expect(uxn.stack).toStrictEqual([0x02, 0x02, 0x02]);
+        });
+
+	test('handle DUP2', () => {
+            const uxn = new Uxn();
+            uxn.emulate('\xa0\x03\x02\x26');
+            expect(uxn.stack).toStrictEqual([0x03, 0x02, 0x03, 0x02]);
         });
 
 	// test all operations (but BRK) are implemented
