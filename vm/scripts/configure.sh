@@ -63,8 +63,8 @@ curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | BOOTSTRAP_H
 
 # install latest Rust
 # The latter is needed for native libraries apparently
-sudo apt install -y llvm-12 libclang-dev
-echo LIBCLANG_PATH=/usr/lib/llvm-12/lib >>~/.bashrc
+sudo apt install -y llvm-18 libclang-dev
+echo LIBCLANG_PATH=/usr/lib/llvm-18/lib >>~/.bashrc
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 
 # install nvm
