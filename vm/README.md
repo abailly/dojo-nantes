@@ -9,6 +9,35 @@ Ce répertoire contient du code [opentofu](https://opentofu.org) pour créer une
 * [rustup](https://rustup.rs) pour du Rust
 * [nvm](https://github.com/nvm-sh/nvm) pour Javascript/Typescript
 
+## Initialisation
+
+Authentification par login dans google cloud:
+
+```
+gcloud auth application-default login
+```
+
+ou définir la variable d'environnement  `GOOGLE_APPLICATION_CREDENTIALS` pointant sur un fichier de clés pour un compte de service.
+
+initialisation de la configuration OpenTofu:
+
+```
+tofu init
+```
+
+Démarrage de la VM
+
+```
+tofu plan -out plan -var-file variables.tfvars
+tofu apply plan
+```
+
+Arrêt de la VM
+
+```
+tofu destroy -var-file variables.tfvars
+```
+
 ## Connexion
 
 Pour pouvoir se connecter durant le dojo, ajoutez votre clé publique ssh au fichier [ssh_keys](./ssh_keys) en faisant une _pull request_, sous la forme:

@@ -1,6 +1,6 @@
 terraform {
  backend "gcs" {
    bucket  = "pankzsoft-terraform-admin"
-   prefix  = "terraform/dev-vm"
+   prefix  = "terraform/dojo-vm"
  }
 }
