@@ -1,3 +1,6 @@
+# scaleway image
+# image-packer-1740921177
+
 resource "google_compute_disk" "dojo-vm-image" {
   name  = "dojo-vm-disk-image"
   type  = "pd-ssd"
