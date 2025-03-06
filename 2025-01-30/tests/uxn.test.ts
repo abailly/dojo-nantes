@@ -93,7 +93,7 @@ class Uxn {
 
     dup(op: Op, stack: any[]) {
         const sliceSize = (op.shortMode) ? 2 : 1;
-        const bytesToDuplicate = stack.slice(0, sliceSize);
+        const bytesToDuplicate = stack.slice(stack.length - sliceSize, stack.length);
 
 	bytesToDuplicate.forEach((a) => {
 	    stack.push(a);
@@ -108,7 +108,7 @@ class Uxn {
 
     ovr(op: Op, stack: any[]) {
       const sliceSize = (op.shortMode) ? 2 : 1;
-      const bytesToDuplicate = this.stack.slice(this.stack.length - 2 * sliceSize, sliceSize);
+      const bytesToDuplicate = stack.slice(stack.length - 2 * sliceSize, stack.length - sliceSize);
 
       bytesToDuplicate.forEach((b) => {
         stack.push(b);
@@ -438,6 +438,12 @@ describe('Uxn VM', () => {
             expect(uxn.stack).toStrictEqual([0x02, 0x02]);
         });
 
+	test('handle DUP on non empty stack', () => {
+            const uxn = new Uxn();
+            uxn.emulate('\x80\x02\x80\x01\x06');
+            expect(uxn.stack).toStrictEqual([0x02, 0x01, 0x01]);
+        });
+
 	test('handle DUPr', () => {
             const uxn = new Uxn();
             uxn.emulate('\xc0\x02\x46');
@@ -464,8 +470,8 @@ describe('Uxn VM', () => {
 
 	test('handle OVR2', () => {
             const uxn = new Uxn();
-            uxn.emulate('\xa0\x12\x34\xa0\x56\x78\x27');
-            expect(uxn.stack).toStrictEqual([0x12, 0x34, 0x56, 0x78, 0x12, 0x34]);
+            uxn.emulate('\xa0\x12\x34\xa0\x12\x34\xa0\x56\x78\x27');
+            expect(uxn.stack).toStrictEqual([0x12, 0x34, 0x12, 0x34, 0x56, 0x78, 0x12, 0x34]);
         });
 
 	// test all operations (but BRK) are implemented
