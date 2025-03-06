@@ -115,9 +115,20 @@ class Uxn {
       const sliceSize = (op.shortMode) ? 2 : 1;
       const bytesToDuplicate = this.peek(sliceSize, stack, 2); 
 
+      // FIXME: this passes the test but it's overloading peek's semantics
+      // it seems the way we implement ovr (and dup) is not really conveying 
+      // the intended semantics of the VM, we should rather directly manupulat 
+      // the stack
+      if (op.keepMode) {
+	    this.peek(2 * sliceSize, stack, sliceSize).forEach((a) => {
+	        stack.push(a);
+	    });
+      }
+
       bytesToDuplicate.forEach((b) => {
         stack.push(b);
       });
+
     }
 
     jmp(op: Op, stack: Stack) {
@@ -477,6 +488,12 @@ describe('Uxn VM', () => {
             const uxn = new Uxn();
             uxn.emulate('\xa0\x12\x34\xa0\x12\x34\xa0\x56\x78\x27');
             expect(uxn.stack).toStrictEqual([0x12, 0x34, 0x12, 0x34, 0x56, 0x78, 0x12, 0x34]);
+        });
+
+	test('handle OVRk', () => {
+            const uxn = new Uxn();
+            uxn.emulate('\xa0\x12\x34\x87');
+            expect(uxn.stack).toStrictEqual([0x12, 0x34, 0x12, 0x34, 0x12]);
         });
 
 	// test all operations (but BRK) are implemented
