@@ -91,9 +91,14 @@ class Uxn {
         this.stack.push(b, c, a);
     }
 
+    peek(nbBytes: number, stack: any[], depth : number) : any[] {
+        const start = stack.length - depth*nbBytes;
+	return stack.slice(start, start + nbBytes);
+    }
+
     dup(op: Op, stack: any[]) {
         const sliceSize = (op.shortMode) ? 2 : 1;
-        const bytesToDuplicate = stack.slice(stack.length - sliceSize, stack.length);
+        const bytesToDuplicate = this.peek(sliceSize, stack, 1);
 
 	bytesToDuplicate.forEach((a) => {
 	    stack.push(a);
@@ -108,7 +113,7 @@ class Uxn {
 
     ovr(op: Op, stack: any[]) {
       const sliceSize = (op.shortMode) ? 2 : 1;
-      const bytesToDuplicate = stack.slice(stack.length - 2 * sliceSize, stack.length - sliceSize);
+      const bytesToDuplicate = this.peek(sliceSize, stack, 2); 
 
       bytesToDuplicate.forEach((b) => {
         stack.push(b);
