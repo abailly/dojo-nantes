@@ -1,13 +1,37 @@
 import { describe, expect, test } from '@jest/globals';
 
 type Program = string
-type Op = { opcode: number, rmode: boolean, shortMode: boolean, keepMode: boolean }
+class Op { 
+	opcode: number
+       	rmode: boolean
+	shortMode: boolean
+	keepMode: boolean 
+
+	constructor(opcode:number, rmode: boolean, shortMode: boolean, keepMode: boolean) {
+	  this.opcode = opcode;
+	  this.rmode = rmode;
+	  this.shortMode = shortMode;
+	  this.keepMode = keepMode;
+	}
+	pop(stack: any[]) : number {
+	  if (this.shortMode) {
+		  const a = stack.pop();
+		  const b = stack.pop();
+		  return ((b << 8) + a);
+	  } else {
+		  return stack.pop();
+	  }
+	}
+
+
+}
+
 type Stack = any[];
 
 function parse(bits: number): Op {
     // Special case handling `JCI/JMI/JSI` instruction, which do not have any mode
     if (bits === 0x20 || bits === 0x40 || bits == 0x60) {
-        return { opcode: bits, rmode: false, shortMode: false, keepMode: false };
+        return new Op(bits, false, false, false);
     }
 
     let rmode = (bits & 0b01000000) > 0;
@@ -23,7 +47,7 @@ function parse(bits: number): Op {
         opcode = opcode & mask & ((keepMode) ? 0b01111111 : 0xff)
     }
 
-    return { opcode, rmode, shortMode, keepMode };
+    return new Op(opcode, rmode, shortMode, keepMode);
 }
 
 class Uxn {
@@ -51,12 +75,12 @@ class Uxn {
         stack[stack.length - 1]++;
     }
 
-    pop(stack: number[]) {
-        stack.pop();
+    pop(op: Op, stack: number[]) {
+        op.pop(stack);
     }
 
-    add() {
-        this.stack.push(this.stack.pop() + this.stack.pop());
+    add(op: Op, stack:number[]) {
+        stack.push(op.pop(stack) + op.pop(stack));
     }
 
     nip(op: Op) {
@@ -94,12 +118,6 @@ class Uxn {
     peek(nbBytes: number, stack: any[], depth : number) : any[] {
         const start = stack.length - depth*nbBytes;
 	      return stack.slice(start, start + nbBytes);
-    }
-
-    pop2(stack: any[]) : number {
-        const a = stack.pop();
-	const b = stack.pop();
-	return ((b << 8) && a);
     }
 
     dup(op: Op, stack: any[]) {
@@ -140,8 +158,8 @@ class Uxn {
     equ(op: Op, stack: any[]) {
         const sliceSize = (op.shortMode) ? 2 : 1;
 
-        const b = op.shortMode ? this.pop2(stack) : stack.pop();
-        const a = op.shortMode ? this.pop2(stack) : stack.pop();
+        const b = op.pop(stack)
+        const a = op.pop(stack)
 
 	if (a === b) {
 	  stack.push(0x01)
@@ -153,12 +171,10 @@ class Uxn {
 
     jmp(op: Op, stack: Stack) {
         if (op.shortMode) {
-            const retl = stack.pop();
-            const reth = stack.pop() << 0x08;
-            const ret = retl + reth;
+            const ret = op.pop(stack);
             this.program_counter = ret;
         } else {
-            const offset = stack.pop();
+            const offset = op.pop(stack);
             this.program_counter += offset + 1;
         }
     }
@@ -202,7 +218,7 @@ class Uxn {
                     this.inc(op, stack);
                     break;
                 case 0x02:
-		                this.pop(stack);
+		    this.pop(op, stack);
                     break;
                 case 0x03:
                     this.nip(op);
@@ -250,7 +266,7 @@ class Uxn {
                     }
                     break;
                 case 0x18:
-                    this.add();
+                    this.add(op, stack);
                     break;
                 case 0x80:
                     this.lit(op, program, stack);
@@ -357,6 +373,7 @@ describe('Uxn VM', () => {
             ["emulate a INC2k command", "\xa0\x43\x43\xa1", [0x43, 0x43, 0x43, 0x44]],
             ["emulate a NIP command", "\x80\x43\x80\x42\x03", [0x42]],
             ["emulate a ADD of 2 values", "\x80\x43\x80\x42\x18", [0x85]],
+            //["emulate a ADD2 of 2 values", "\x80\x43\x80\x42\x80\x43\x80\x42\x38", [0x86, 0x84]],
             ["emulate a SWP of 2 values", "\x80\x43\x80\x42\x04", [0x42, 0x43]],
             ["emulate a ROT of 3 values", "\x80\x43\x80\x42\x80\x41\x05", [0x42, 0x41, 0x43]],
         ] as [string, string, number[]][]).forEach(([message, bytecode, stack]) => {
