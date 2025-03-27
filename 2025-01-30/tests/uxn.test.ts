@@ -15,12 +15,23 @@ class Op {
 	}
 	pop(stack: any[]) : number {
 	  if (this.shortMode) {
-		  const a = stack.pop();
-		  const b = stack.pop();
-		  return ((b << 8) + a);
+		  const lo = stack.pop();
+		  const hi = stack.pop();
+		  return ((hi << 8) + lo);
 	  } else {
 		  return stack.pop();
 	  }
+	}
+
+	push(stack: any[], value: number) {
+           if (this.shortMode) {
+		   const lo = value & 0xff;
+		   const hi = value >> 8;
+		   stack.push(hi);
+		   stack.push(lo);
+	   } else { 
+             stack.push(value);
+	   } 
 	}
 
 
@@ -80,7 +91,7 @@ class Uxn {
     }
 
     add(op: Op, stack:number[]) {
-        stack.push(op.pop(stack) + op.pop(stack));
+        op.push(stack, op.pop(stack) + op.pop(stack));
     }
 
     nip(op: Op) {
@@ -373,7 +384,7 @@ describe('Uxn VM', () => {
             ["emulate a INC2k command", "\xa0\x43\x43\xa1", [0x43, 0x43, 0x43, 0x44]],
             ["emulate a NIP command", "\x80\x43\x80\x42\x03", [0x42]],
             ["emulate a ADD of 2 values", "\x80\x43\x80\x42\x18", [0x85]],
-            //["emulate a ADD2 of 2 values", "\x80\x43\x80\x42\x80\x43\x80\x42\x38", [0x86, 0x84]],
+            ["emulate a ADD2 of 2 values", "\x80\x43\x80\x42\x80\x43\x80\x42\x38", [0x86, 0x84]],
             ["emulate a SWP of 2 values", "\x80\x43\x80\x42\x04", [0x42, 0x43]],
             ["emulate a ROT of 3 values", "\x80\x43\x80\x42\x80\x41\x05", [0x42, 0x41, 0x43]],
         ] as [string, string, number[]][]).forEach(([message, bytecode, stack]) => {
