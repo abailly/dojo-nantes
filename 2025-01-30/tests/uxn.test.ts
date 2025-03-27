@@ -113,15 +113,20 @@ class Uxn {
         }
     }
 
-    swap() {
-        this.stack.push.apply(this.stack, this.stack.splice(this.stack.length - 2, 1));
+    swap(op: Op, stack: Stack) {
+       let lo = op.pop(stack);
+       let hi = op.pop(stack);
+       op.push(stack, lo);
+       op.push(stack, hi);
     }
 
-    rot() {
-        const c = this.stack.pop();
-        const b = this.stack.pop();
-        const a = this.stack.pop();
-        this.stack.push(b, c, a);
+    rot(op: Op, stack: Stack) {
+        const c = op.pop(stack);
+        const b = op.pop(stack);
+        const a = op.pop(stack);
+	op.push(stack, b);
+	op.push(stack, c);
+	op.push(stack, a);
     }
 
     peek(nbBytes: number, stack: any[], depth : number) : any[] {
@@ -233,10 +238,10 @@ class Uxn {
                     this.nip(op, stack);
                     break;
                 case 0x04:
-                    this.swap();
+                    this.swap(op, stack);
                     break;
                 case 0x05:
-                    this.rot();
+                    this.rot(op, stack);
                     break;
                 case 0x06:
                     this.dup(op, stack);
