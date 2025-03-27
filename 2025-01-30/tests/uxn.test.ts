@@ -94,12 +94,10 @@ class Uxn {
         op.push(stack, op.pop(stack) + op.pop(stack));
     }
 
-    nip(op: Op) {
-        const [index, numberOfBytes] = op.shortMode
-            ? [this.stack.length - (2 * 2), (1 * 2)]
-            : [this.stack.length - 2, 1];
-
-        this.stack.splice(index, numberOfBytes);
+    nip(op: Op, stack : number[]) {
+       let val = op.pop(stack);
+       op.pop(stack);
+       op.push(stack, val);
     }
 
     lit(op: Op, program: Program, stack: Stack) {
@@ -232,7 +230,7 @@ class Uxn {
 		    this.pop(op, stack);
                     break;
                 case 0x03:
-                    this.nip(op);
+                    this.nip(op, stack);
                     break;
                 case 0x04:
                     this.swap();
