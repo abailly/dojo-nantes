@@ -93,43 +93,63 @@ class Uxn {
 
     peek(nbBytes: number, stack: any[], depth : number) : any[] {
         const start = stack.length - depth*nbBytes;
-	return stack.slice(start, start + nbBytes);
+	      return stack.slice(start, start + nbBytes);
+    }
+
+    pop2(stack: any[]) : number {
+        const a = stack.pop();
+	const b = stack.pop();
+	return ((b << 8) && a);
     }
 
     dup(op: Op, stack: any[]) {
         const sliceSize = (op.shortMode) ? 2 : 1;
         const bytesToDuplicate = this.peek(sliceSize, stack, 1);
 
-	bytesToDuplicate.forEach((a) => {
-	    stack.push(a);
-	});
+	      bytesToDuplicate.forEach((a) => {
+	          stack.push(a);
+	      });
 
-	if (op.keepMode) {
-	    bytesToDuplicate.forEach((a) => {
-	        stack.push(a);
-	    });
-	}
+	      if (op.keepMode) {
+	          bytesToDuplicate.forEach((a) => {
+	              stack.push(a);
+	          });
+	      }
     }
 
     ovr(op: Op, stack: any[]) {
-      const sliceSize = (op.shortMode) ? 2 : 1;
-      const bytesToDuplicate = this.peek(sliceSize, stack, 2); 
+        const sliceSize = (op.shortMode) ? 2 : 1;
+        const bytesToDuplicate = this.peek(sliceSize, stack, 2);
 
-      // FIXME: this passes the test but it's overloading peek's semantics
-      // it seems the way we implement ovr (and dup) is not really conveying 
-      // the intended semantics of the VM, we should rather directly manupulat 
-      // the stack
-      if (op.keepMode) {
-	    this.peek(2 * sliceSize, stack, sliceSize).forEach((a) => {
-	        stack.push(a);
-	    });
-      }
+        // FIXME: this passes the test but it's overloading peek's semantics
+        // it seems the way we implement ovr (and dup) is not really conveying
+        // the intended semantics of the VM, we should rather directly manupulat
+        // the stack
+        if (op.keepMode) {
+	          this.peek(2 * sliceSize, stack, sliceSize).forEach((a) => {
+	              stack.push(a);
+	          });
+        }
 
-      bytesToDuplicate.forEach((b) => {
-        stack.push(b);
-      });
+        bytesToDuplicate.forEach((b) => {
+            stack.push(b);
+        });
 
     }
+
+    equ(op: Op, stack: any[]) {
+        const sliceSize = (op.shortMode) ? 2 : 1;
+
+        const b = op.shortMode ? this.pop2(stack) : stack.pop();
+        const a = op.shortMode ? this.pop2(stack) : stack.pop();
+
+	if (a === b) {
+	  stack.push(0x01)
+	} else {
+	  stack.push(0x00)
+	}
+    }
+
 
     jmp(op: Op, stack: Stack) {
         if (op.shortMode) {
@@ -145,28 +165,28 @@ class Uxn {
 
     jci(program: Program) {
         const cond = this.stack.pop();
-	if (cond === 0x00) {
-	    this.program_counter += 2;
-	} else {
+	      if (cond === 0x00) {
+	          this.program_counter += 2;
+	      } else {
             this.jmi(program);
-	}
+	      }
     }
 
     jmi(program: Program) {
-    	let hb = program.charCodeAt(this.program_counter + 1) << 0x08;
-    	let lb = program.charCodeAt(this.program_counter + 2);
-    	let offset = hb + lb;	
-    	this.program_counter += offset;
+    	  let hb = program.charCodeAt(this.program_counter + 1) << 0x08;
+    	  let lb = program.charCodeAt(this.program_counter + 2);
+    	  let offset = hb + lb;
+    	  this.program_counter += offset;
     }
 
     jsi(program: Program) {
-    	let hb = program.charCodeAt(this.program_counter + 1) << 0x08;
-    	let lb = program.charCodeAt(this.program_counter + 2);
-    	let offset = hb + lb;
-        let ret = this.program_counter + 3;	
-	this.return_stack.push(ret >> 0x08 & 0xff);
-	this.return_stack.push(ret & 0xff);
-    	this.program_counter += offset;
+    	  let hb = program.charCodeAt(this.program_counter + 1) << 0x08;
+    	  let lb = program.charCodeAt(this.program_counter + 2);
+    	  let offset = hb + lb;
+        let ret = this.program_counter + 3;
+	      this.return_stack.push(ret >> 0x08 & 0xff);
+	      this.return_stack.push(ret & 0xff);
+    	  this.program_counter += offset;
     }
 
     emulate(program: Program) {
@@ -182,7 +202,7 @@ class Uxn {
                     this.inc(op, stack);
                     break;
                 case 0x02:
-		    this.pop(stack);
+		                this.pop(stack);
                     break;
                 case 0x03:
                     this.nip(op);
@@ -198,6 +218,9 @@ class Uxn {
                     break;
                 case 0x07:
                     this.ovr(op, stack);
+                    break;
+                case 0x08:
+                    this.equ(op, stack);
                     break;
                 case 0x0c:
                     this.jmp(op, stack);
@@ -232,15 +255,15 @@ class Uxn {
                 case 0x80:
                     this.lit(op, program, stack);
                     break;
-		case 0x20:
-		    this.jci(program);
-		    break;
-		case 0x40:
-		    this.jmi(program);
-		    break;
-		case 0x60:
-		    this.jsi(program);
-		    break;
+		            case 0x20:
+		                this.jci(program);
+		                break;
+		            case 0x40:
+		                this.jmi(program);
+		                break;
+		            case 0x60:
+		                this.jsi(program);
+		                break;
                 default:
                     throw new Error(":/");
             }
@@ -363,8 +386,8 @@ describe('Uxn VM', () => {
             uxn.emulate('\x80\x00'.repeat(255) + '\x80\x01\x0e\x00\x80\x01');
             // 0x0000 : 0x80 0x00
             // ... (255 fois)
-            // 0x01fe : 0x80 0x01 
-            // 0x0200 : 0x0e     
+            // 0x01fe : 0x80 0x01
+            // 0x0200 : 0x0e
             // 0x0201 : 0x00 <- l'addresse de cette instruction sur le return stack
             // 0x0202: 0x80 0x01
             expect(uxn.return_stack).toStrictEqual([0x02, 0x01]);
@@ -411,101 +434,120 @@ describe('Uxn VM', () => {
             uxn.emulate('\xc0\x03\x42');
             expect(uxn.return_stack).toStrictEqual([]);
         });
-        
-	test('handle short mode for NIP (NIP2)', () => {
+
+	      test('handle short mode for NIP (NIP2)', () => {
             const uxn = new Uxn();
             uxn.emulate('\x80\x12\x80\x34\x80\x56\x80\x78\x23');
             expect(uxn.stack).toStrictEqual([0x56, 0x78]);
         });
-       
+
        	test('handle JCI when condition is not zero', () => {
             const uxn = new Uxn();
             uxn.emulate('\x80\x01\x20\x00\x04\x80\x02\x80\x03');
             expect(uxn.stack).toStrictEqual([0x03]);
         });
-     
+
        	test('handle JCI at larger offset when condition is not zero', () => {
             const uxn = new Uxn();
             uxn.emulate('\x80\x01\x20\x00\x06\x80\x02\x00\x00\x80\x03');
             expect(uxn.stack).toStrictEqual([0x03]);
         });
-     
-     	test('handle JCI when condition is zero', () => {
+
+     	  test('handle JCI when condition is zero', () => {
             const uxn = new Uxn();
             uxn.emulate('\x80\x00\x20\x00\x04\x80\x02\x80\x03');
             expect(uxn.stack).toStrictEqual([0x02, 0x03]);
         });
-       	
-	test('handle JMI', () => {
+
+	      test('handle JMI', () => {
             const uxn = new Uxn();
             uxn.emulate('\x40\x00\x06\x80\x02\x00\x00\x80\x03');
             expect(uxn.stack).toStrictEqual([0x03]);
         });
-     
-	test('handle JSI', () => {
+
+	      test('handle JSI', () => {
             const uxn = new Uxn();
             uxn.emulate('\x60\x00\x05\x80\x02\x00\x80\x03\x6c');
             expect(uxn.stack).toStrictEqual([0x03, 0x02]);
         });
 
-	test('handle DUP', () => {
+	      test('handle DUP', () => {
             const uxn = new Uxn();
             uxn.emulate('\x80\x02\x06');
             expect(uxn.stack).toStrictEqual([0x02, 0x02]);
         });
 
-	test('handle DUP on non empty stack', () => {
+	      test('handle DUP on non empty stack', () => {
             const uxn = new Uxn();
             uxn.emulate('\x80\x02\x80\x01\x06');
             expect(uxn.stack).toStrictEqual([0x02, 0x01, 0x01]);
         });
 
-	test('handle DUPr', () => {
+	      test('handle DUPr', () => {
             const uxn = new Uxn();
             uxn.emulate('\xc0\x02\x46');
             expect(uxn.return_stack).toStrictEqual([0x02, 0x02]);
         });
 
-	test('handle DUPk', () => {
+	      test('handle DUPk', () => {
             const uxn = new Uxn();
             uxn.emulate('\x80\x02\x86');
             expect(uxn.stack).toStrictEqual([0x02, 0x02, 0x02]);
         });
 
-	test('handle DUP2', () => {
+	      test('handle DUP2', () => {
             const uxn = new Uxn();
             uxn.emulate('\xa0\x03\x02\x26');
             expect(uxn.stack).toStrictEqual([0x03, 0x02, 0x03, 0x02]);
         });
 
-	test('handle OVR', () => {
+	      test('handle OVR', () => {
             const uxn = new Uxn();
             uxn.emulate('\x80\x12\x80\x34\x07');
             expect(uxn.stack).toStrictEqual([0x12,0x34,0x12]);
         });
 
-	test('handle OVR2', () => {
+	      test('handle OVR2', () => {
             const uxn = new Uxn();
             uxn.emulate('\xa0\x12\x34\xa0\x12\x34\xa0\x56\x78\x27');
             expect(uxn.stack).toStrictEqual([0x12, 0x34, 0x12, 0x34, 0x56, 0x78, 0x12, 0x34]);
         });
 
-	test('handle OVRk', () => {
+	      test('handle OVRk', () => {
             const uxn = new Uxn();
             uxn.emulate('\xa0\x12\x34\x87');
             expect(uxn.stack).toStrictEqual([0x12, 0x34, 0x12, 0x34, 0x12]);
         });
 
-	// test all operations (but BRK) are implemented
-	// by implemented we mean "does something"
+	test('handle EQU', () => {
+            const uxn = new Uxn();
+            uxn.emulate('\x80\x12\x80\x12\x08');
+            expect(uxn.stack).toStrictEqual([0x01]);
+	});	
+
+	test('handle not EQU', () => {
+            const uxn = new Uxn();
+            uxn.emulate('\x80\x12\x80\x34\x08');
+            expect(uxn.stack).toStrictEqual([0x00]);
+        });
+
+	test('handle EQU2', () => {
+            const uxn = new Uxn();
+            uxn.emulate('\x80\x12\x80\x34\x80\x12\x80\x34\x28');
+            expect(uxn.stack).toStrictEqual([0x01]);
+        });
+
+
+	      // test all operations (but BRK) are implemented
+	      // by implemented we mean "does something"
         [...Array(20).keys()].filter((x) => x > 0).forEach((byte) => {
-	   xtest (`handle 0x${byte.toString(16)} instruction`, () => {
-		   const uxn = new Uxn();
-		   const program = String.fromCharCode(byte);
-		   uxn.emulate(program);
-		   expect(uxn.program_counter).not.toStrictEqual(0);
-	   });
-	});
-         
+            xtest (`handle 0x${byte.toString(16)} instruction`, () => {
+		            const uxn = new Uxn();
+		            const program = String.fromCharCode(byte);
+		            uxn.emulate(program);
+		            expect(uxn.program_counter).not.toStrictEqual(0);
+	          });
+	      });
+
     });
 });
