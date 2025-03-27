@@ -91,13 +91,34 @@ class Uxn {
     }
 
     add(op: Op, stack:number[]) {
-        op.push(stack, op.pop(stack) + op.pop(stack));
+       let lo = op.pop(stack);
+       let hi = op.pop(stack);
+       if (op.keepMode) {
+	   op.push(stack, hi);
+           op.push(stack, lo);
+       } 
+       op.push(stack, lo + hi);
     }
 
     nip(op: Op, stack : number[]) {
-       let val = op.pop(stack);
-       op.pop(stack);
-       op.push(stack, val);
+       let lo = op.pop(stack);
+       let hi = op.pop(stack);
+       if (op.keepMode) {
+	   op.push(stack, hi);
+           op.push(stack, lo);
+       } 
+       op.push(stack, lo);
+    }
+
+    swap(op: Op, stack: Stack) {
+       let lo = op.pop(stack);
+       let hi = op.pop(stack);
+       if(op.keepMode) {
+         op.push(stack, hi);
+         op.push(stack, lo);
+       }
+       op.push(stack, lo);
+       op.push(stack, hi);
     }
 
     lit(op: Op, program: Program, stack: Stack) {
@@ -111,13 +132,6 @@ class Uxn {
         if (op.shortMode) {
             pushOneByte();
         }
-    }
-
-    swap(op: Op, stack: Stack) {
-       let lo = op.pop(stack);
-       let hi = op.pop(stack);
-       op.push(stack, lo);
-       op.push(stack, hi);
     }
 
     rot(op: Op, stack: Stack) {
@@ -135,6 +149,7 @@ class Uxn {
     }
 
     dup(op: Op, stack: any[]) {
+      if(op.keepMode) {
         const sliceSize = (op.shortMode) ? 2 : 1;
         const bytesToDuplicate = this.peek(sliceSize, stack, 1);
 
@@ -142,11 +157,14 @@ class Uxn {
 	          stack.push(a);
 	      });
 
-	      if (op.keepMode) {
-	          bytesToDuplicate.forEach((a) => {
-	              stack.push(a);
-	          });
-	      }
+	      bytesToDuplicate.forEach((a) => {
+	          stack.push(a);
+	      });
+      } else {
+	 const val = op.pop(stack)
+	 op.push(stack, val)
+	 op.push(stack, val)
+      }
     }
 
     ovr(op: Op, stack: any[]) {
@@ -386,9 +404,13 @@ describe('Uxn VM', () => {
             ["emulate a INCk command", "\x80\x43\x81", [0x43, 0x44]],
             ["emulate a INC2k command", "\xa0\x43\x43\xa1", [0x43, 0x43, 0x43, 0x44]],
             ["emulate a NIP command", "\x80\x43\x80\x42\x03", [0x42]],
+            ["emulate a NIP2k command", "\x80\x12\x80\x34\x80\x56\x80\x78\xa3", [0x12, 0x34, 0x56, 0x78, 0x56, 0x78]],
             ["emulate a ADD of 2 values", "\x80\x43\x80\x42\x18", [0x85]],
             ["emulate a ADD2 of 2 values", "\x80\x43\x80\x42\x80\x43\x80\x42\x38", [0x86, 0x84]],
+            ["emulate a ADDk of 2 values", "\x80\x02\x80\x5d\x98", [0x02, 0x5d, 0x5f]],
             ["emulate a SWP of 2 values", "\x80\x43\x80\x42\x04", [0x42, 0x43]],
+            ["emulate a SWPk of 2 values", "\x80\x12\x80\x34\x84", [0x12, 0x34, 0x34, 0x12]],
+            ["emulate a SWP2k of 2 values", "\x80\x12\x80\x34\x80\x56\x80\x78\xa4", [0x12, 0x34, 0x56, 0x78, 0x56, 0x78, 0x12, 0x34]],
             ["emulate a ROT of 3 values", "\x80\x43\x80\x42\x80\x41\x05", [0x42, 0x41, 0x43]],
         ] as [string, string, number[]][]).forEach(([message, bytecode, stack]) => {
             test(message, () => {
